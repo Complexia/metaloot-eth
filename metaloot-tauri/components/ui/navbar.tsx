@@ -6,27 +6,24 @@ import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import {userStorageCheck} from '@/components/utilities/nftStorageCheck';
+import { userStorageCheck } from '@/components/utilities/nftStorageCheck';
+import { useUser } from '../context/UserContext';
+import metaLootClient, { User } from '../utilities/metaLootClient';
 // Define the User type based on FCL's user state
-interface User {
-  addr: string;
-  cid?: string;
-  expiresAt?: number;
-  f_type?: string;
-  f_vsn?: string;
-  loggedIn?: boolean;
-  services?: Array<object>;
-}
 
 const Navbar: React.FC = () => {
+  const { user, setUser } = useUser();
+
   const listener = async () => {
     await onOpenUrl(async (urls: string[]) => {
       console.log('deep link:', urls)
+      const res = metaLootClient(urls, user);
+      console.log("this is meta response ", res);
     })
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
+  // const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
   useEffect(() => {
     listener();
     // Subscribe to user state'
@@ -34,10 +31,7 @@ const Navbar: React.FC = () => {
     const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
       console.log("this is user ", currentUser);
       if (currentUser.loggedIn) {
-        setUser({
-          addr: currentUser.addr,
-          loggedIn: currentUser.loggedIn,
-        });
+        setUser(currentUser);
         // Ensure account is set up to receive NFTs
         setIsLoading(true);
         await userStorageCheck();
@@ -53,9 +47,15 @@ const Navbar: React.FC = () => {
       unsubscribe();
     };
   }, []);
+
   const handleLogin = async () => {
     try {
       await fcl.authenticate();
+      fcl.currentUser.subscribe(async (currentUser: User) => {
+        setIsLoading(true);
+        setUser(user);
+      });
+      setUser(user)
     } catch (err) {
       console.error("Authentication failed:", err);
       // setError("Authentication failed. Please try again.");
@@ -64,6 +64,12 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     fcl.unauthenticate();
+  };
+
+  const readUser = () => {
+    console.log("current user trace ", user);
+    const res = metaLootClient(["metaloot://callback/get-user"], user);
+    console.log("this is meta response ", res);
   };
   return (
     <nav className="navbar bg-base-200">
@@ -81,7 +87,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <div className="dropdown">
               <label tabIndex={0} className="btn btn-ghost btn-circle">
-                {user.loggedIn ? (
+                {user?.loggedIn ? (
                   <div className="avatar">
                     <div className="w-10 rounded-full">
                       <img src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/profile_media/7294811" alt="User Avatar" />
@@ -98,7 +104,7 @@ const Navbar: React.FC = () => {
                 <li><a>Logout</a></li>
               </ul>
             </div>
-            {user.loggedIn && (
+            {user?.loggedIn && (
               <div className="ml-2">
                 <h2>Welcome, {user.addr}</h2>
               </div>
@@ -116,12 +122,20 @@ const Navbar: React.FC = () => {
 
           {/* Third sector: Login/Logout */}
           <div className="flex-none">
-            {user.loggedIn ? (
-     
+            {user?.loggedIn ? (
+
+              // <button onClick={handleLogout} className="btn btn-ghost">
+              //   Logout
+              // </button>
+              <>
                 <button onClick={handleLogout} className="btn btn-ghost">
                   Logout
                 </button>
-           
+                <button onClick={readUser} className="btn btn-ghost">
+                  TEST
+                </button>
+              </>
+
             ) : (
               <button onClick={handleLogin} className="btn btn-ghost">
                 Login with Flow Wallet

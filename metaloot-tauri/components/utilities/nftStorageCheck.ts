@@ -1,5 +1,5 @@
 import * as fcl from "@onflow/fcl";
-// import { error } from "console";
+import * as t from '@onflow/types';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║ Flow Client Library (FCL) Configuration                                    ║
@@ -19,8 +19,8 @@ import * as fcl from "@onflow/fcl";
 //   .put("discovery.wallet", "http://localhost:8701/fcl/authn")  // Local wallet discovery
 //   .put("flow.network", "emulator")
 
-  //TESTNET
-  fcl.config()
+//TESTNET
+fcl.config()
   .put("flow.network", "testnet")
   .put("accessNode.api", "https://rest-testnet.onflow.org")
   .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn")
@@ -47,7 +47,7 @@ fun main(): String {
 }
       `,
     });
-    console.log("this is result ",result);
+    console.log("this is result ", result);
   } catch (error) {
     console.error("Error setting up NFT storage:", error);
     // throw error;
@@ -85,9 +85,47 @@ transaction {
     }
       `,
     });
-    console.log("this is result ",result);
+    console.log("this is result ", result);
   } catch (error) {
     console.error("Error setting up NFT storage:", error);
+    // throw error;
+  }
+}
+
+export async function getUser(userAddress: any) {
+  // let nftContractName = "MetaLootNFT"
+  // let nftContractAddress = "0xf8d6e0586b0a20c7";
+  console.log("here 0", userAddress);
+  // Check if the user has the NFT receiver capability
+  try {
+    const result = await fcl.query({
+      cadence: `
+import NonFungibleToken from 0x631e88ae7f1d7c20
+
+access(all) fun main(address: Address, collectionPublicPath: PublicPath): [UInt64] {
+    let account = getAccount(address)
+
+    let collectionRef = account.capabilities.borrow<&{NonFungibleToken.Collection}>(
+            collectionPublicPath
+    ) ?? panic("The account ".concat(address.toString()).concat(" does not have a NonFungibleToken Collection at ")
+                .concat(collectionPublicPath.toString())
+                .concat(". The account must initialize their account with this collection first!"))
+
+    return collectionRef.getIDs()
+}
+      `,
+      // @ts-ignore
+      args: (arg,t) => [
+        arg(userAddress, t.String),
+        arg({
+          domain:"public",
+          type:""
+        }, t.PathValue)
+      ]
+    });
+    console.log("on-chain res: ", result);
+  } catch (error) {
+    console.error("on-chain err: ", error);
     // throw error;
   }
 }
