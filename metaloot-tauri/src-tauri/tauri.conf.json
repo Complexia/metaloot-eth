@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
-  "productName": "src-tauri",
+  "productName": "metaloot-tauri",
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
   "build": {
@@ -12,15 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "Metaloot",
-        "width": 800,
-        "height": 600,
+        "title": "MetaLoot",
+        "width": 1200,
+        "height": 800,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "label": "main"
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://wallet.blocto.app; connect-src 'self' https://wallet.blocto.app; img-src 'self' data: https://*.blocto.app; style-src 'self' 'unsafe-inline';"
     }
   },
   "bundle": {
