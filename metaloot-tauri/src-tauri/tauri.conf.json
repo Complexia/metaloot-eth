@@ -2,12 +2,12 @@
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "metaloot-tauri",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.metaloot.dev",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
     "beforeDevCommand": "bun dev",
-    "beforeBuildCommand": "bun build"
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [
@@ -20,13 +20,20 @@
         "label": "main"
       }
     ],
-   "security": {
-      "csp": null
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc://localhost https://rest-testnet.onflow.org https://biz-touch-7unj.shuttle.app https://pulse.walletconnect.org https://verify.walletconnect.org wss://relay.walletconnect.com; img-src 'self' data: https://*.supabase.co; script-src 'self'; style-src 'self'; frame-src 'self' https://fcl-discovery.onflow.org https://verify.walletconnect.org;"
     }
-    
   },
- 
-
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        { "host": "metaloot", "pathPrefix": ["/open"] }
+      ],
+      "desktop": {
+        "schemes": ["metaloot"]
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

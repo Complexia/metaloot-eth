@@ -10,7 +10,12 @@ import {userStorageCheck} from '@/components/utilities/nftStorageCheck';
 // Define the User type based on FCL's user state
 interface User {
   addr: string;
-  loggedIn: boolean;
+  cid?: string;
+  expiresAt?: number;
+  f_type?: string;
+  f_vsn?: string;
+  loggedIn?: boolean;
+  services?: Array<object>;
 }
 
 const Navbar: React.FC = () => {
