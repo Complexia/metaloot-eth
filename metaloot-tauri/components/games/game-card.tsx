@@ -28,7 +28,7 @@ const GameCard = (game: Game) => {
                 console.log(`Clicked game: ${game.title}`);
                 await openExternalUri();
             }}
-            className="card bg-base-100 shadow-xl  h-96">
+            className="card bg-base-100 shadow-xl  h-96 cursor-pointer">
             <figure className="h-1/2">
                 <img
                     src={game.media}

@@ -20,9 +20,9 @@
         "label": "main"
       }
     ],
-    "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://wallet.blocto.app; connect-src 'self' https://wallet.blocto.app; img-src 'self' data: https://*.blocto.app; style-src 'self' 'unsafe-inline';"
-    }
+   "security": {
+      "csp": null
+    } 
   },
   "bundle": {
     "active": true,

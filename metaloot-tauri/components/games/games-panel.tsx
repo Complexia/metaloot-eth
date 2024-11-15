@@ -13,13 +13,20 @@ export const GamesPanel = () => {
   const games: Game[] = [
     {
       id: "1",
+      title: "Agent Town",
+      description: "Dive into a world of agents. But behold, each one posesses a wallet and is not afraid to transact!",
+      media: "https://eiwzivmnxlmtwrzejwdl.supabase.co/storage/v1/object/public/space-avatars/ai-town.png?t=2024-11-15T17%3A44%3A53.475Z",
+      uri: "agent-town://open"
+    },
+    {
+      id: "2",
       title: "Noodle-Quest",
       description: "Embark on an interstellar journey across unexplored noodle quest.",
       media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/noodleQuest",
       uri: "noodle-quest://open"
     },
     {
-      id: "2",
+      id: "3",
       title: "SamusVSMegaman",
       description: "A fast-paced fighting game where Samus and Megaman battle it out.",
       media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/megaMan",

@@ -20,27 +20,6 @@ const nextConfig = {
             },
         ],
     },
-    async headers() {
-        return [
-          {
-            // Match all routes
-            source: '/(.*)',
-            headers: [
-              {
-                key: 'Content-Security-Policy',
-                value: [
-                  "default-src 'self';",
-                  "connect-src 'self' https://rest-testnet.onflow.org https://biz-touch-7unj.shuttle.app;",
-                  "img-src 'self' https://*.supabase.co;",
-                  "script-src 'self';",
-                  "style-src 'self';",
-                  "frame-src 'self' https://fcl-discovery.onflow.org;", // Allow the Flow discovery URL
-                ].join(' '),
-              },
-            ],
-          },
-        ];
-      },
 };
 
 export default nextConfig;
