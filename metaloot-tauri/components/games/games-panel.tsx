@@ -2,9 +2,9 @@ import React from 'react';
 import GameCard from '@/components/games/game-card';
 import { Game } from '@/components/types';
 
-interface GamesPanelProps {
-  games: Game[];
-}
+// interface GamesPanelProps {
+//   games: Game[];
+// }
 
 
 
@@ -38,4 +38,3 @@ export const GamesPanel = () => {
     </div>
   );
 };
-
