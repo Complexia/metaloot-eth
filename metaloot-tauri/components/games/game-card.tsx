@@ -3,6 +3,7 @@
 import { Game } from "@/components/types";
 import { open } from '@tauri-apps/plugin-shell'
 
+
 const GameCard = (game: Game) => {
     // Function to open external URI using Tauri shell
     const openExternalUri = async () => {

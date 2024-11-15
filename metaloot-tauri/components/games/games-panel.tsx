@@ -20,13 +20,20 @@ export const GamesPanel = () => {
     },
     {
       id: "2",
+      title: "Trophy Hunter",
+      description: "Hunt Trophies and win.",
+      media: "https://eiwzivmnxlmtwrzejwdl.supabase.co/storage/v1/object/public/space-avatars/trophyhunter.png?t=2024-11-15T19%3A42%3A10.002Z",
+      uri: "trophyhunter://open"
+    },
+    {
+      id: "3",
       title: "Noodle-Quest",
       description: "Embark on an interstellar journey across unexplored noodle quest.",
       media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/noodleQuest",
       uri: "noodle-quest://open"
     },
     {
-      id: "3",
+      id: "4",
       title: "SamusVSMegaman",
       description: "A fast-paced fighting game where Samus and Megaman battle it out.",
       media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/megaMan",
