@@ -1,5 +1,5 @@
 import * as fcl from "@onflow/fcl";
-import { error } from "console";
+// import { error } from "console";
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║ Flow Client Library (FCL) Configuration                                    ║
@@ -32,8 +32,8 @@ import { error } from "console";
 
 // Assuming ensureAccountIsSetUp is already defined as in the previous response
 export async function nftStorageCheck(userAddress: string) {
-  let nftContractName = "MetaLootNFT"
-  let nftContractAddress = "0xf8d6e0586b0a20c7";
+  // let nftContractName = "MetaLootNFT"
+  // let nftContractAddress = "0xf8d6e0586b0a20c7";
   console.log("here 0", userAddress);
   // Check if the user has the NFT receiver capability
   try {
