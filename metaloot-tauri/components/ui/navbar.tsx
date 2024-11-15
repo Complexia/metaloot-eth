@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { FaUserCircle } from 'react-icons/fa';
 import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
+import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import { nftStorageCheck ,userStorageCheck} from '@/components/utilities/nftStorageCheck';
+import {userStorageCheck} from '@/components/utilities/nftStorageCheck';
 // Define the User type based on FCL's user state
 interface User {
   addr: string;
@@ -13,11 +14,19 @@ interface User {
 }
 
 const Navbar: React.FC = () => {
+  const listener = async () => {
+    await onOpenUrl(async (urls: string[]) => {
+      console.log('deep link:', urls)
+    })
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
   useEffect(() => {
-    // Subscribe to user state
-    const unsubscribe = fcl.currentUser.subscribe(async (currentUser: any) => {
+    listener();
+    // Subscribe to user state'
+    //"@ts-expect-error"
+    const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
       console.log("this is user ", currentUser);
       if (currentUser.loggedIn) {
         setUser({
@@ -103,14 +112,11 @@ const Navbar: React.FC = () => {
           {/* Third sector: Login/Logout */}
           <div className="flex-none">
             {user.loggedIn ? (
-              <>
+     
                 <button onClick={handleLogout} className="btn btn-ghost">
                   Logout
                 </button>
-                <button onClick={userStorageCheck} className="btn btn-ghost">
-                  Set Up Account
-                </button>
-              </>
+           
             ) : (
               <button onClick={handleLogin} className="btn btn-ghost">
                 Login with Flow Wallet
