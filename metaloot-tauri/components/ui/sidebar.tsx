@@ -13,7 +13,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="bg-base-200 h-screen p-4">
+    <div className="bg-base-200 h-screen p-4 flex flex-col justify-between">
       <ul className="menu menu-vertical w-full">
         {sidebarItems.map((item) => (
           <li key={item.name}>
@@ -31,6 +31,13 @@ const Sidebar = () => {
           </li>
         ))}
       </ul>
+      <div className="p-4 mb-36">
+        <img 
+          src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/vr-side.png"
+          alt="Game Box"
+          className=" object-cover rounded-lg shadow-lg"
+        />
+      </div>
     </div>
   );
 };
