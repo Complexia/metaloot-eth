@@ -323,13 +323,21 @@ async fn end_game() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[get("/item")]
+#[get("/item/add")]
 async fn add_item() -> impl Responder {
-    println!("/item");
+    println!("/item/add");
     GLOBAL_APP_HANDLE
         .get()
         .unwrap()
-        .emit("add-item", "")
+        .emit("add-item", serde_json::json!({
+            "itemName": "something",
+            "itemType": "123",
+            "attributes": serde_json::json!({
+                "attack":"100",
+                "defense":3
+            }),
+            "thumpNail": "",
+        }))
         .unwrap();
     HttpResponse::Ok().finish()
 }

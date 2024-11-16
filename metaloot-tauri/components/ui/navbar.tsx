@@ -6,14 +6,14 @@ import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import { userStorageCheck } from '@/components/utilities/nftStorageCheck';
+import { addItem, startGame, stopGame, userStorageCheck } from '@/components/utilities/nftStorageCheck';
 import { useUser } from '../context/UserContext';
 import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
 import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core';
 // Define the User type based on FCL's user state
 
-const Navbar = ({updateTab}) => {
+const Navbar = ({ updateTab }) => {
   const { user, setUser } = useUser();
 
   useEffect(() => {
@@ -25,55 +25,65 @@ const Navbar = ({updateTab}) => {
       });
 
       await listen('get-stored-user', (event) => {
-        console.log("get-stored-user event listener triggered", event);
-        console.log("this is the user here", user);
-        let resp = processUrl(event.event as string, user);
-        let response_p = {
-          response_data: JSON.stringify(resp),
-          user_json: JSON.stringify(user),
+        // invoke to BE if needed
+        return {
+          action: 'get-stored-user',
           user: user
         };
-        console.log("response_ps from navbar", response_p);
-        
+        // console.log("get-stored-user event listener triggered", event);
+        // console.log("this is the user here", user);
+        // let resp = processUrl(event.event as string, user);
+        // let response_p = {
+        //   response_data: JSON.stringify(resp),
+        //   user_json: JSON.stringify(user),
+        //   user: user
+        // };
+        // console.log("response_ps from navbar", response_p);
       });
 
       await listen('start-game', (event) => {
-        console.log("start-game event listener triggered", event);
-        console.log("this is the user here", user);
-        let resp = processUrl(event.event as string, user);
-        let response_p = {
-          response_data: JSON.stringify(resp),
-          user_json: JSON.stringify(user),
-          user: user
-        };
-        console.log("response_ps from navbar start game", response_p);
-        
+        startGame();
+        // console.log("start-game event listener triggered", event);
+        // console.log("this is the user here", user);
+        // let resp = processUrl(event.event as string, user);
+        // let response_p = {
+        //   response_data: JSON.stringify(resp),
+        //   user_json: JSON.stringify(user),
+        //   user: user
+        // };
+        // console.log("response_ps from navbar start game", response_p);
       });
 
       await listen('end-game', (event) => {
-        console.log("end-game event listener triggered", event);
-        console.log("this is the user here", user);
-        let resp = processUrl(event.event as string, user);
-        let response_p = {
-          response_data: JSON.stringify(resp),
-          user_json: JSON.stringify(user),
-          user: user
-        };
-        console.log("response_ps from navbar end game", response_p);
-        
+        stopGame();
+        // console.log("end-game event listener triggered", event);
+        // console.log("this is the user here", user);
+        // let resp = processUrl(event.event as string, user);
+        // let response_p = {
+        //   response_data: JSON.stringify(resp),
+        //   user_json: JSON.stringify(user),
+        //   user: user
+        // };
+        // console.log("response_ps from navbar end game", response_p);
       });
 
       await listen('add-item', (event) => {
-        console.log("add-item event listener triggered", event);
-        console.log("this is the user here", user);
-        let resp = processUrl(event.event as string, user);
-        let response_p = {
-          response_data: JSON.stringify(resp),
-          user_json: JSON.stringify(user),
-          user: user
+        console.log("add-item event listener triggered", event.payload);
+        const payload = event.payload as {
+          itemName: string;
+          itemType: string,
+          attributes: object,
+          thumpNail: string
         };
-        console.log("response_ps from navbar add item", response_p);
-        
+        addItem(payload.itemName, payload.itemType, payload.attributes, payload.thumpNail);
+        // console.log("this is the user here", user);
+        // let resp = processUrl(event.event as string, user);
+        // let response_p = {
+        //   response_data: JSON.stringify(resp),
+        //   user_json: JSON.stringify(user),
+        //   user: user
+        // };
+        // console.log("response_ps from navbar add item", response_p);
       });
 
       await listen('get-user-nfts', (event) => {
@@ -108,7 +118,7 @@ const Navbar = ({updateTab}) => {
   const [isLoading, setIsLoading] = useState(false);
   //const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
   // useEffect(() => {
-    
+
   //   // Subscribe to user state'
   //   //"@ts-expect-error"
   //   const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
@@ -141,7 +151,7 @@ const Navbar = ({updateTab}) => {
   }, [user]);
 
   const handleLogin = async () => {
-    
+
     try {
       await fcl.authenticate();
       console.log("logging in...")
@@ -149,7 +159,7 @@ const Navbar = ({updateTab}) => {
         setIsLoading(true);
         setUser(currentUser);
         console.log("set this to current user ", currentUser);
-        
+
         let payload = {
           addr: currentUser.addr,
           cid: currentUser.cid,
@@ -218,7 +228,7 @@ const Navbar = ({updateTab}) => {
           </div>
 
           {/* Second sector: Navigation Links */}
-          
+
           <div className="flex-none">
             <ul className="menu menu-horizontal px-1">
               <li><span onClick={() => updateTab("games")}>Games</span></li>
