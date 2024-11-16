@@ -42,7 +42,15 @@ export default function Game() {
                 throw new Error(`HTTP error! status: ${nft_response.status}`);
             }
             const nftData = await nft_response.json();
+            console.log("nft data: ", nftData)
             setNftData(nftData)
+            nftData.forEach((nft: any) => {
+                console.log("nft: ", nft)
+                console.log("nft name: ", nft.name)
+                if (nft.name === "Mystical Sword") {
+                    setNameTag("Champion");
+                }
+            });
 
             setLoading(false)
         } catch (error) {

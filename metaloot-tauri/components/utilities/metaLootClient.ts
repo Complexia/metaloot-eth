@@ -3,6 +3,9 @@ import * as fcl from "@onflow/fcl";
 // import express from 'express';
 // import metaLootRoutes from './metalootRoutes';
 import { listen } from '@tauri-apps/api/event'
+import { getAllItem } from '../utilities/nftStorageCheck';
+import { invoke } from "@tauri-apps/api/core";
+
 
 
 
@@ -62,7 +65,7 @@ export const processUrl = (url: string, user: User | null) => {
 
         console.log("PATH1", path)
 
-        
+
 
         if (path === 'get-stored-user') {
             console.log('Getting stored user info...');
@@ -74,6 +77,38 @@ export const processUrl = (url: string, user: User | null) => {
             // }
             return {
                 action: 'get-stored-user',
+                user: user
+            };
+        }
+
+
+        if (path === 'get-user-nfts') {
+            console.log('Getting user nfts...');
+
+            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+                console.log("this is sub user ", currentUser);
+                let items = await getAllItem(currentUser.addr);
+
+                console.log("itemsss", items)
+                let resp = await invoke("store_user_nft_data", { userNftData: JSON.stringify(items) });
+                console.log("this is the response from the store_user_data", resp);
+
+                console.log("invoking update complete")
+                let resp_complete = await invoke("update_completed");
+
+
+
+            });
+
+
+            // Handle user retrieval logic
+            // if (user.addr) {
+            //     getUser(user.addr);
+            // } else {
+            //     console.error('Address parameter is required for get-user endpoint');
+            // }
+            return {
+                action: 'get-user-nfts',
                 user: user
             };
         }
@@ -108,17 +143,17 @@ export const processUrl = (url: string, user: User | null) => {
                 console.log("this is sub user ", currentUser);
                 console.log("this is user ", currentUser);
                 if (currentUser.loggedIn) {
-                  // Ensure account is set up to receive NFTs
-          
-                  await userStorageCheck();
-                  // setError(""); // Clear any previous errors
-                
+                    // Ensure account is set up to receive NFTs
+
+                    await userStorageCheck();
+                    // setError(""); // Clear any previous errors
+
 
                 }
-                
-              });
 
-              
+            });
+
+
 
             console.log("currentUser inside start game", currentUser);
             return {
@@ -135,8 +170,8 @@ export const processUrl = (url: string, user: User | null) => {
             const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
                 console.log("this is sub user ", currentUser);
 
-                
-              });
+
+            });
 
             console.log("currentUser inside start game", currentUser);
 
@@ -155,10 +190,10 @@ export const processUrl = (url: string, user: User | null) => {
             const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
                 console.log("this is sub user ", currentUser);
 
-                
-              });
 
-             
+            });
+
+
 
             console.log("currentUser inside start game", currentUser);
 
@@ -193,9 +228,9 @@ export default function metaLootClient(urls: string[], user: User | null): MetaL
     // Check if user is logged in
     console.log("user inside metaLootClient ", user);
 
-    
 
-   
+
+
 
     if (!user || !user.loggedIn) {
         return {

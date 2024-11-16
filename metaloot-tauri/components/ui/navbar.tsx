@@ -75,6 +75,19 @@ const Navbar = ({updateTab}) => {
         console.log("response_ps from navbar add item", response_p);
         
       });
+
+      await listen('get-user-nfts', (event) => {
+        console.log("get-user-nfts event listener triggered", event);
+        console.log("this is the user here", user);
+        let resp = processUrl(event.event as string, user);
+        let response_p = {
+          response_data: JSON.stringify(resp),
+          user_json: JSON.stringify(user),
+          user: user
+        };
+        console.log("response_ps from navbar get-user-nfts", response_p);
+        
+      });
     };
 
     // Only run on client side
