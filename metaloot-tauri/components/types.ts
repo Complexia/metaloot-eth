@@ -9,13 +9,12 @@ interface Game {
 
   interface InventoryItem {
     id: string;
+    uuid: string;
+    description: string;
     itemName: string;
     itemType: string;
-    attributes: {
-      rarity: string;
-      originGame: string;
-      description: string;
-    };
+    attributes: object;
+    metadata: object;
     thumbnail: string;
   }
 

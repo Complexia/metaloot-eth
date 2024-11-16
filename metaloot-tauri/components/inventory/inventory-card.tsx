@@ -17,7 +17,8 @@ const InventoryCard = (item: InventoryItem) => {
     //     }
     // };
     // Function to truncate text
-    const truncateText = (text: string, maxLength: number) => {
+    const truncateText = (text: string | null, maxLength: number) => {
+        if (!text) return '';
         return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     };
 
@@ -43,7 +44,10 @@ const InventoryCard = (item: InventoryItem) => {
                     <div className="badge badge-secondary">item</div>
                 </h2>
                 <p className="flex-grow overflow-hidden">
-                    {truncateText(item.attributes.description, 60)}
+                    {truncateText(item.description, 60)}
+                </p>
+                <p className="flex-grow overflow-hidden">
+                    {truncateText(JSON.stringify(item.attributes), 60)}
                 </p>
                 {/* <div className="card-actions justify-end">
                     <div className="badge badge-outline">Fashion</div>
