@@ -1,214 +1,152 @@
-import { getUser, userStorageCheck } from "./nftStorageCheck";
+import express, { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Router } from 'express';
+import { addItem, getItem, getUser, startGame, stopGame } from "../utilities/nftStorageCheck";
 import * as fcl from "@onflow/fcl";
-// import express from 'express';
-// import metaLootRoutes from './metalootRoutes';
-import { listen } from '@tauri-apps/api/event'
+import { User } from './metaLootClient';
 
+const router = Router();
 
-
-// ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║                                     MetaLoot Client SDK                                          ║
-// ║                                                                                                  ║
-// ║ 🎮 A powerful bridge between game studios and Flow blockchain                                    ║
-// ║ 🔗 Seamlessly interact with Flow smart contracts                                                 ║
-// ║ 🚀 Features:                                                                                     ║
-// ║    - User Authentication & Management                                                            ║
-// ║    - NFT Metadata Reading & Writing                                                             ║
-// ║    - Game Session Handling                                                                      ║
-// ║    - Real-time Blockchain Updates                                                               ║
-// ║                                                                                                  ║
-// ║ 🛠️  Built with TypeScript for type-safe blockchain interactions                                 ║
-// ║ 🔒 Security-first design with robust error handling                                             ║
-// ║                                                                                                  ║
-// ║ 📝 Usage Example of shell command:                                                                               ║
-// ║    open "metaloot://callback/add-item?name=Sword&type=weapon&rarity=rare"                             ║
-// ║    This deep link adds a rare weapon type NFT to player's inventory                            ║
-// ║                                                                                                  ║
-// ║ © 2024 MetaLoot - Empowering Game Developers in the Web3 Space                                  ║
-// ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-
-export interface MetaLootResponse {
-    data: any;
-    timestamp: string;
-    status: "success" | "error";
+// Define interface for authenticated user
+interface AuthenticatedRequest extends Request {
+    user?: {
+        loggedIn: boolean;
+    };
 }
 
-export interface User {
-    addr: string;
-    cid?: string;
-    expiresAt?: number;
-    f_type?: string;
-    f_vsn?: string;
-    loggedIn?: boolean;
-    services?: Array<object>;
-}
-
-// Extract and export the processUrl function
-export const processUrl = (url: string, user: User | null) => {
-    try {
-        // const urlObj = new URL(url);
-        // const path = urlObj.pathname.toLowerCase();
-        // const queryParams = Object.fromEntries(urlObj.searchParams);
-
-        // if (!user || !user.loggedIn) {
-        //     return {
-        //         action: 'error',
-        //         error: 'Please login with Flow wallet'
-        //     };
-        // }
-
-        let path = url;
-
-        console.log("PATH1", path)
-
-        
-
-        if (path === 'get-stored-user') {
-            console.log('Getting stored user info...');
-            // Handle user retrieval logic
-            // if (user.addr) {
-            //     getUser(user.addr);
-            // } else {
-            //     console.error('Address parameter is required for get-user endpoint');
-            // }
-            return {
-                action: 'get-stored-user',
-                user: user
-            };
-        }
-
-        // if (path === 'get-user') {
-        //     console.log('Getting user info...');
-        //     // Handle user retrieval logic
-        //     if (user.addr) {
-        //         getUser(user.addr);
-        //     } else {
-        //         console.error('Address parameter is required for get-user endpoint');
-        //     }
-        //     return {
-        //         action: 'get-user',
-        //         user: user.addr
-        //     };
-        // }
-
-        if (path == 'read-item-meta') {
-            console.log('Reading item metadata...');
-            // Handle item metadata reading
-            return {
-                action: 'read-item-meta',
-            };
-        }
-
-        //handle start game logic
-        if (path == 'start-game') {
-            console.log('Starting new game session...');
-            let currentUser = fcl.currentUser();
-            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
-                console.log("this is sub user ", currentUser);
-                console.log("this is user ", currentUser);
-                if (currentUser.loggedIn) {
-                  // Ensure account is set up to receive NFTs
-          
-                  await userStorageCheck();
-                  // setError(""); // Clear any previous errors
-                
-
-                }
-                
-              });
-
-              
-
-            console.log("currentUser inside start game", currentUser);
-            return {
-                action: 'start-game',
-                user: currentUser
-            };
-        }
-
-        if (path == 'end-game') {
-            console.log('Ending game session...');
-
-            console.log('Starting new game session...');
-            let currentUser = fcl.currentUser();
-            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
-                console.log("this is sub user ", currentUser);
-
-                
-              });
-
-            console.log("currentUser inside start game", currentUser);
-
-            // Handle game end logic
-            return {
-                action: 'end-game',
-            };
-        }
-
-        if (path == 'add-item') {
-            console.log('Adding new item...');
-            // Handle item addition logic
-
-            console.log('Starting new game session...');
-            let currentUser = fcl.currentUser();
-            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
-                console.log("this is sub user ", currentUser);
-
-                
-              });
-
-             
-
-            console.log("currentUser inside start game", currentUser);
-
-
-            return {
-                action: 'add-item',
-                // params: queryParams
-            };
-        }
-
-        console.warn('Unknown endpoint:', path);
-        return {
-            action: 'unknown',
-            path: path
-        };
-
-    } catch (error) {
-        console.error('Error processing URL:', error);
-        return {
-            action: 'error',
-            error: error instanceof Error ? error.message : 'Unknown error'
-        };
-    }
-};
-
-export default function metaLootClient(urls: string[], user: User | null): MetaLootResponse {
-    console.log('🌟 Welcome to MetaLoot - Your Gateway to Web3! 🚀\n',
-        '⛓️ Processing URLs:', urls, '\n',
-        '💎 Powered by Flow Blockchain\n',
-        '✨ Building the Future of Digital Assets ✨'
-    );
-    // Check if user is logged in
-    console.log("user inside metaLootClient ", user);
-
-    
-
-   
-
+// Middleware to check user authentication
+const authenticateUser: RequestHandler = (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): void => {
+    const user = req.user;
     if (!user || !user.loggedIn) {
-        return {
+        res.status(401).json({
             data: "Please login with Flow wallet",
             timestamp: new Date().toISOString(),
-            status: "error",
-        };
+            status: "error"
+        });
+        return;
     }
+    next();
+};
 
-    const results = urls.map(url => processUrl(url, user));
-    return {
-        data: results,
-        timestamp: new Date().toISOString(),
-        status: "success"
-    };
+// Get user information
+router.get('/user/:address', authenticateUser, async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const userInfo = await getUser(req.params.address);
+        res.json({
+            data: userInfo,
+            timestamp: new Date().toISOString(),
+            status: "success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+            status: "error"
+        });
+    }
+});
+
+// Read item metadata
+router.get('/item/:itemId/metadata', authenticateUser, async (req, res) => {
+    try {
+        // Implement item metadata reading logic here
+        // difirent ? wit 2 use ?
+        let currentUser = fcl.currentUser();
+        const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+            console.log("this is sub user ", currentUser);
+            const item = getItem(currentUser.addr, req.params.itemId);
+            res.json({
+                data: item,
+                timestamp: new Date().toISOString(),
+                status: "success"
+            });
+        });
+
+        res.json({
+            data: { /* item metadata */ },
+            timestamp: new Date().toISOString(),
+            status: "success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+            status: "error"
+        });
+    }
+});
+
+// Start game session
+router.post('/game/start', authenticateUser, async (req, res) => {
+    try {
+        // Implement game start logic here
+        startGame();
+        res.json({
+            data: { sessionId: 'new-session-id' },
+            timestamp: new Date().toISOString(),
+            status: "success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+            status: "error"
+        });
+    }
+});
+
+// End game session
+router.post('/game/:sessionId/end', authenticateUser, async (req, res) => {
+    try {
+        // Implement game end logic here
+        stopGame();
+        res.json({
+            data: "🎮 Game session ended! Your epic loot has been minted as NFTs and added to your collection! 🏆✨",
+            timestamp: new Date().toISOString(),
+            status: "success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+            status: "error"
+        });
+    }
+});
+
+// Add new item
+router.post('/item', authenticateUser, async (req: Request, res: Response) => {
+    try {
+        const { itemName, itemType, attributes, thumpNail } = req.body as {
+            itemName: string;
+            itemType: string;
+            attributes: object;
+            thumpNail: string;
+        };
+        // Implement item addition logic here
+        addItem(itemName,itemType,attributes,thumpNail);
+        res.json({
+            data: "🎯 Epic item added to your collection! Your new loot awaits! ✨🎮",
+            timestamp: new Date().toISOString(),
+            status: "success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+            status: "error"
+        });
+    }
+});
+
+export default router;
+
+function readItem() {
+    throw new Error('Function not implemented.');
 }
