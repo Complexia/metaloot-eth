@@ -6,6 +6,7 @@ import Navbar from '@/components/ui/navbar';
 import { useState } from 'react';
 import { InventoryPanel } from './inventory/inventory-panel';
 import { TransactionsPanel } from './transactions/transactions-panel';
+import { AiPanel } from './ai/mainMenu';
 
 const Interface: React.FC = () => {
 
@@ -30,6 +31,8 @@ const Interface: React.FC = () => {
             <InventoryPanel />
           ) : tab === "transactions" ? (
             <TransactionsPanel />
+          ) : tab === "shop" ? (
+            <AiPanel />
           ) : null}
         </div>
       </div>

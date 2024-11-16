@@ -234,7 +234,8 @@ const Navbar = ({ updateTab }) => {
               <li><span onClick={() => updateTab("games")}>Games</span></li>
               <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
               <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
-              <li><Link href="/shop">Shop</Link></li>
+              <li><span onClick={() => updateTab("shop")}>Shop</span></li>
+              {/* <li><Link href="/shop">Shop</Link></li> */}
             </ul>
           </div>
 
