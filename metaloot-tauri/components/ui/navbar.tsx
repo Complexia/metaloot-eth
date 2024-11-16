@@ -6,7 +6,7 @@ import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import { userStorageCheck } from '@/components/utilities/nftStorageCheck';
+import { mintNFT, stopGame, userStorageCheck } from '@/components/utilities/nftStorageCheck';
 import { useUser } from '../context/UserContext';
 import metaLootClient, { User } from '../utilities/metaLootClient';
 // Define the User type based on FCL's user state
@@ -17,8 +17,8 @@ const Navbar: React.FC = () => {
   const listener = async () => {
     await onOpenUrl(async (urls: string[]) => {
       console.log('deep link:', urls)
-      const res = metaLootClient(urls, user);
-      console.log("this is meta response ", res);
+      // const res = metaLootClient(urls, user);
+      // console.log("this is meta response ", res);
     })
   };
 
@@ -31,10 +31,10 @@ const Navbar: React.FC = () => {
     const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
       console.log("this is user ", currentUser);
       if (currentUser.loggedIn) {
+        await userStorageCheck();
         setUser(currentUser);
         // Ensure account is set up to receive NFTs
         setIsLoading(true);
-        await userStorageCheck();
         setIsLoading(false);
         // setError(""); // Clear any previous errors
       } else {
@@ -55,7 +55,6 @@ const Navbar: React.FC = () => {
         setIsLoading(true);
         setUser(user);
       });
-      setUser(user)
     } catch (err) {
       console.error("Authentication failed:", err);
       // setError("Authentication failed. Please try again.");
@@ -68,9 +67,34 @@ const Navbar: React.FC = () => {
 
   const readUser = () => {
     console.log("current user trace ", user);
-    const res = metaLootClient(["metaloot://callback/get-user"], user);
+    const res = metaLootClient("get-user", user, "Welcome To MetaLoot");
     console.log("this is meta response ", res);
   };
+  const setPathUser = async () => {
+    const res = await userStorageCheck();
+    console.log(" testing settingPath, ", res);
+  };
+  const startGame = () => {
+    console.log("current user trace ", user);
+    const res = metaLootClient("start-game", user, "Welcome To MetaLoot");
+    console.log("this is meta response ", res);
+  };
+  const addItem = (itemName: string, itemType: string, attributes: object, thumpNail: string) => {
+    console.log("current user trace ", user);
+    const res = metaLootClient("add-item", user, {
+      itemName: itemName,
+      itemType: itemType,
+      attributes: attributes,
+      thumpNail: thumpNail
+    });
+    console.log("this is meta response ", res);
+  };
+  const endGame = () => {
+    console.log("current user trace ", user);
+    const res = metaLootClient("stop-game", user, "Welcome To MetaLoot");
+    console.log("this is meta response ", res);
+  };
+
   return (
     <nav className="navbar bg-base-200">
       {isLoading ? (
@@ -132,7 +156,38 @@ const Navbar: React.FC = () => {
                   Logout
                 </button>
                 <button onClick={readUser} className="btn btn-ghost">
-                  TEST
+                  Test: ReadNFTCollectionFromUser
+                </button>
+                <button onClick={setPathUser} className="btn btn-ghost">
+                  Test: SetupCollectionPath
+                </button>
+                <button onClick={startGame} className="btn btn-ghost">
+                  Test: StartGame
+                </button>
+                <button onClick={() => addItem(
+                  "Mystical Sword",
+                  "Sword",
+                  {
+                    key:"Attack",
+                    value: "69"
+                  },
+                  "This Is ThumpNail"
+                )} className="btn btn-ghost">
+                  Test: AddItem
+                </button>
+                <button onClick={stopGame} className="btn btn-ghost">
+                  Test: StopGame
+                </button>
+                <button onClick={() => mintNFT(
+                  "Mystical Sword",
+                  "Sword",
+                  {
+                    key:"Attack",
+                    value: "69"
+                  },
+                  "This Is ThumpNail"
+                )} className="btn btn-ghost">
+                  Test: mintNFT
                 </button>
               </>
 
