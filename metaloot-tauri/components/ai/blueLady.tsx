@@ -31,7 +31,6 @@ export default function BlueLadyModel(props: ModelProps) {
     // set actions and pose when user interact
     useEffect(() => {
         const availableActions = [
-            actions.Female_Idle,
             actions.Female_Talk
         ].filter(action => action !== null);
 

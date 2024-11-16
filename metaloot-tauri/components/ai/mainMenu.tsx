@@ -15,31 +15,31 @@ export const AiPanel = () => {
     {
       id: "1",
       title: "Iron Man",
-      description: "Similar Tony Start But With A Twist .....",
+      description: "Similar to Tony Stark But With A Twist .....",
       media: "0x14588644555336",
       uri: "agent-town://open"
     },
     {
-      id: "2",
+        id: "2",
+        title: "Robot Eve",
+        description: "A Cute Assistant from The Movie: *Love *Death *Robot ......",
+        media: "0x08767863245463426",
+        uri: "crazyjumper://open"
+      },
+    {
+      id: "3",
       title: "Blue Lady",
       description: "A Real Estate Agent By Day, An Assassin By Night...",
       media: "0x198888008772352",
       uri: "trophyhunter://open"
     },
-    // {
-    //   id: "3",
-    //   title: "Crazy Jumper",
-    //   description: "Jump like your life depends on it.",
-    //   media: "https://eiwzivmnxlmtwrzejwdl.supabase.co/storage/v1/object/public/space-avatars/crazy-jumper.png?t=2024-11-16T12%3A24%3A07.694Z",
-    //   uri: "crazyjumper://open"
-    // },
-    // {
-    //   id: "4",
-    //   title: "Noodle-Quest",
-    //   description: "Embark on an interstellar journey across unexplored noodle quest.",
-    //   media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/noodleQuest",
-    //   uri: "noodle-quest://open"
-    // },
+    {
+      id: "4",
+      title: "Assistant",
+      description: "An Ai Assistant Can Do Every Task, Analytics .....",
+      media: "0x0988777664667666",
+      uri: "noodle-quest://open"
+    },
     // {
     //   id: "5",
     //   title: "SamusVSMegaman",

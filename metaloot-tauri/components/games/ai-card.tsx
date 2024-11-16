@@ -47,7 +47,7 @@ const AiCard = (game: Game) => {
             <div className="card-body h-1/2 flex flex-col">
                 <h2 className="card-title text-lg">
                     {truncateText(game.title, 30)}
-                    <div className="badge badge-secondary">Game</div>
+                    <div className="badge badge-secondary">Unity</div>
                 </h2>
                 <p className="flex-grow overflow-hidden">
                     {truncateText(game.description, 60)}

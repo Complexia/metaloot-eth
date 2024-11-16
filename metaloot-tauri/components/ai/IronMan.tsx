@@ -96,4 +96,5 @@ export default function IronManModel(props: ModelProps) {
   );
 }
 
+// useGLTF.preload('/IronMan.glb');
 useGLTF.preload('/IronMan.glb');
