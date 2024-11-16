@@ -35,20 +35,35 @@ type GLTFResult = GLTF & {
   }
 }
 
-type ModelProps = JSX.IntrinsicElements['group']
+type ModelProps = JSX.IntrinsicElements['group'] & {
+  actions?: string[];
+}
 
 export function RobotEve(props: ModelProps) {
   const group = useRef<Group>(null)
   const { nodes, materials, animations } = useGLTF(
     '/futuristic_flying_animated_robot_-_low_poly.glb'
   ) as GLTFResult
-  const { actions } = useAnimations(animations, group)
+  const { actions: animationActions } = useAnimations(animations, group)
 
   useEffect(() => {
-    if (actions.Scene) {
-      actions.Scene.play()
+    // Stop any currently playing animations
+    Object.values(animationActions).forEach(action => action?.stop());
+
+    // Play the requested animations from props
+    if (props.actions) {
+      props.actions.forEach(actionName => {
+        if (animationActions[actionName]) {
+          animationActions[actionName].play();
+        }
+      });
+    } else {
+      // Default to Scene animation if no actions specified
+      if (animationActions.Scene) {
+        animationActions.Scene.play();
+      }
     }
-  }, [actions])
+  }, [props.actions, animationActions])
 
   return (
     <group ref={group} {...props} dispose={null}>

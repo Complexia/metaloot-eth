@@ -26,17 +26,26 @@ type GLTFResult = GLTF & {
 
 interface ModelProps {
   [key: string]: any;
+  actions?: string[];
 }
 export function PlayRobotModel(props: ModelProps) {
     const group = useRef<Group>(null)
     const { nodes, materials, animations } = useGLTF('/robot_playground.glb') as GLTFResult
-    const { actions } = useAnimations(animations, group)
+    const { actions: animationActions } = useAnimations(animations, group)
     
     React.useEffect(() => {
-        if (actions.Experiment) {
-            actions.Experiment.play();
+        // Stop any currently playing animations
+        Object.values(animationActions).forEach(action => action?.stop());
+
+        // Play the requested animations from props
+        if (props.actions) {
+            props.actions.forEach(actionName => {
+                if (animationActions[actionName]) {
+                    animationActions[actionName].play();
+                }
+            });
         }
-    }, [actions]);
+    }, [props.actions, animationActions]);
     return (
         <group ref={group} {...props} dispose={null}>
             <group name="Sketchfab_Scene">

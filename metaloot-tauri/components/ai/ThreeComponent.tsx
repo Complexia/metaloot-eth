@@ -10,9 +10,10 @@ import { PlayRobotModel } from './playGroundRobot';
 
 interface ThreeComponentProps {
     chatBotState: string;
+    actions?: string[];
 }
 
-const ThreeComponent: React.FC<ThreeComponentProps> = ({ chatBotState }) => {
+const ThreeComponent: React.FC<ThreeComponentProps> = ({ chatBotState,actions }) => {
 
     const PlayRobotMyCamera = (): null => {
         const { camera } = useThree();
@@ -58,13 +59,13 @@ const ThreeComponent: React.FC<ThreeComponentProps> = ({ chatBotState }) => {
 
     const renderModel = () => {
         if (chatBotState === "0x14588644555336") {
-            return <IronManModel botState={chatBotState} />;
+            return <IronManModel botState={chatBotState} actions={actions} />;
         } else if (chatBotState === "0x198888008772352") {
-            return <BlueLadyModel botState={chatBotState} />;
+            return <BlueLadyModel botState={chatBotState} actions={actions} />;
         } else if (chatBotState === "0x08767863245463426") {
-            return <RobotEve position={[0, -2, 3]} scale={[2, 2, 2]} />
+            return <RobotEve position={[0, -2, 3]} scale={[2, 2, 2]} actions={actions} />
         } else if (chatBotState === "0x0988777664667666") {
-            return <PlayRobotModel position={[0, 6, -6]} scale={[6, 6, 6]}/>
+            return <PlayRobotModel position={[0, 6, -6]} scale={[6, 6, 6]} actions={actions}/>
         }
         //position={[0, -2, 3]} scale={[2, 2, 2]}
         console.log("not found")

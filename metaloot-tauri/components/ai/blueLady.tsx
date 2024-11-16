@@ -20,19 +20,19 @@ type GLTFResult = GLTF & {
 
 interface ModelProps {
   botState?: string;
+  actions?: string[];
 }
 
 export default function BlueLadyModel(props: ModelProps) {
     const group = useRef<Group>(null);
     const { nodes, materials, animations } = useGLTF('/blueLady.glb') as GLTFResult;
-    const { actions } = useAnimations(animations, group);
+    const { actions: animationActions } = useAnimations(animations, group);
     const [userState, setUserState] = useState<string>('idle');
 
     // set actions and pose when user interact
     useEffect(() => {
-        const availableActions = [
-            actions.Female_Talk
-        ].filter(action => action !== null);
+        const availableActions = props.actions?.map(actionName => animationActions[actionName])
+            .filter(action => action !== null) || [];
 
         let currentTimeout: NodeJS.Timeout;
 
@@ -59,7 +59,7 @@ export default function BlueLadyModel(props: ModelProps) {
             }
             availableActions.forEach(action => action?.fadeOut(0.5));
         };
-    }, [actions]);
+    }, [props.actions]);
 
     // use gltfjsx@6.1.4 to read local files glb then convert into component that are read by react-three-drei
     return (

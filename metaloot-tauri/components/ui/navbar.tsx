@@ -96,7 +96,7 @@ const Navbar = ({ updateTab }) => {
           user: user
         };
         console.log("response_ps from navbar get-user-nfts", response_p);
-        
+
       });
     };
 
@@ -151,26 +151,22 @@ const Navbar = ({ updateTab }) => {
   }, [user]);
 
   const handleLogin = async () => {
-
     try {
       await fcl.authenticate();
       console.log("logging in...")
+      setIsLoading(true);
       fcl.currentUser.subscribe(async (currentUser: User) => {
-        setIsLoading(true);
         setUser(currentUser);
         console.log("set this to current user ", currentUser);
-
         let payload = {
           addr: currentUser.addr,
           cid: currentUser.cid,
           loggedIn: currentUser.loggedIn
         }
-
         let resp = await invoke("store_user_data", { userData: JSON.stringify(payload) });
         console.log("this is the response from the store_user_data", resp);
-        setIsLoading(false);
       });
-
+      setIsLoading(false);
     } catch (err) {
       console.error("Authentication failed:", err);
       // setError("Authentication failed. Please try again.");

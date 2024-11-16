@@ -42,7 +42,7 @@ const AiCard = (game: Game) => {
                     alt="Shoes"
                     className="w-full h-full object-cover"
                 /> */}
-                <ThreeComponent chatBotState={game.media}/>
+                <ThreeComponent chatBotState={game.media} actions={game.actions}/>
             </figure>
             <div className="card-body h-1/2 flex flex-col">
                 <h2 className="card-title text-lg">

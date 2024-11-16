@@ -26,8 +26,8 @@ fcl.config()
   .put("accessNode.api", "https://rest-testnet.onflow.org")
   .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn")
   .put("app.detail.title", "MetaLoot") // Your app's name
-  .put("app.detail.icon", "https://www.saturnlabs.dev") // URL to your app's icon
-  // .put("app.detail.description", "A description of your app") // Short description of your app
+  .put("app.detail.icon", "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/metalootLogo.png") // URL to your app's icon
+  .put("app.detail.description", "A Multiverse Gateway for All Gaming") // Short description of your app
   .put("walletconnect.projectId", "759fd0100ca6feff6d72c03a85e8f223") // URL to your app's icon
   .put("app.detail.url", "https://www.saturnlabs.dev"); // URL to your app
 

@@ -31,26 +31,18 @@ type GLTFResult = GLTF & {
 interface ModelProps {
   userInteract?: string;
   botState: string;
+  actions?: string[];
 }
 
 export default function IronManModel(props: ModelProps) {
   const group = useRef<Group>(null);
   const { nodes, materials, animations } = useGLTF('/IronMan.glb') as GLTFResult;
-  const { actions } = useAnimations(animations, group);
-//   const { userState, updateUserState } = useInteractionState();
-
+  const { actions: animationActions } = useAnimations(animations, group);
 
   // set actions and pose when user interact
   useEffect(() => {
-    const availableActions = [
-      actions.Dance,
-      actions.HeadHit, 
-      actions.Talk2,
-      actions.Talk1,
-      actions.Stand,
-      actions.Looking,
-      actions.Greet
-    ].filter(action => action !== null);
+    const availableActions = props.actions?.map(actionName => animationActions[actionName])
+      .filter(action => action !== null) || [];
 
     let currentTimeout: NodeJS.Timeout;
 
@@ -77,7 +69,7 @@ export default function IronManModel(props: ModelProps) {
       }
       availableActions.forEach(action => action?.fadeOut(0.5));
     };
-  }, [actions]);
+  }, [props.actions]);
 
   return (
     <group ref={group} {...props} dispose={null}>
