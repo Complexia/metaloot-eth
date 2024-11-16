@@ -8,13 +8,83 @@ import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
 import { userStorageCheck } from '@/components/utilities/nftStorageCheck';
 import { useUser } from '../context/UserContext';
-import metaLootClient, { User } from '../utilities/metaLootClient';
+import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
+import { listen } from '@tauri-apps/api/event'
+import { invoke } from '@tauri-apps/api/core';
 // Define the User type based on FCL's user state
 
 const Navbar: React.FC = () => {
   const { user, setUser } = useUser();
 
+  useEffect(() => {
+    // Move event listeners inside useEffect
+    const setupListeners = async () => {
+      console.log("USERR", user)
+      await listen('get-user', (event) => {
+        console.log("user-response12 event listener triggered", event);
+      });
+
+      await listen('get-stored-user', (event) => {
+        console.log("get-stored-user event listener triggered", event);
+        console.log("this is the user here", user);
+        let resp = processUrl(event.event as string, user);
+        let response_p = {
+          response_data: JSON.stringify(resp),
+          user_json: JSON.stringify(user),
+          user: user
+        };
+        console.log("response_ps from navbar", response_p);
+        
+      });
+
+      await listen('start-game', (event) => {
+        console.log("start-game event listener triggered", event);
+        console.log("this is the user here", user);
+        let resp = processUrl(event.event as string, user);
+        let response_p = {
+          response_data: JSON.stringify(resp),
+          user_json: JSON.stringify(user),
+          user: user
+        };
+        console.log("response_ps from navbar start game", response_p);
+        
+      });
+
+      await listen('end-game', (event) => {
+        console.log("end-game event listener triggered", event);
+        console.log("this is the user here", user);
+        let resp = processUrl(event.event as string, user);
+        let response_p = {
+          response_data: JSON.stringify(resp),
+          user_json: JSON.stringify(user),
+          user: user
+        };
+        console.log("response_ps from navbar end game", response_p);
+        
+      });
+
+      await listen('add-item', (event) => {
+        console.log("add-item event listener triggered", event);
+        console.log("this is the user here", user);
+        let resp = processUrl(event.event as string, user);
+        let response_p = {
+          response_data: JSON.stringify(resp),
+          user_json: JSON.stringify(user),
+          user: user
+        };
+        console.log("response_ps from navbar add item", response_p);
+        
+      });
+    };
+
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      setupListeners();
+    }
+  }, []); // Empty dependency array since these listeners should only be set up once
+
   const listener = async () => {
+    console.log("HELLO from navbar ", user);
     await onOpenUrl(async (urls: string[]) => {
       console.log('deep link:', urls)
       const res = metaLootClient(urls, user);
@@ -23,21 +93,23 @@ const Navbar: React.FC = () => {
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  // const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
+  //const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
   useEffect(() => {
-    listener();
+    
     // Subscribe to user state'
     //"@ts-expect-error"
     const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+      setIsLoading(true);
       console.log("this is user ", currentUser);
       if (currentUser.loggedIn) {
         setUser(currentUser);
         // Ensure account is set up to receive NFTs
-        setIsLoading(true);
+
         await userStorageCheck();
         setIsLoading(false);
         // setError(""); // Clear any previous errors
       } else {
+        setIsLoading(false);
         setUser({ addr: "", loggedIn: false });
       }
     });
@@ -48,14 +120,34 @@ const Navbar: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+
+    console.log("this gets called when user changes ", user);
+    listener();
+
+  }, [user]);
+
   const handleLogin = async () => {
+    
     try {
       await fcl.authenticate();
+      console.log("logging in...")
       fcl.currentUser.subscribe(async (currentUser: User) => {
         setIsLoading(true);
-        setUser(user);
+        setUser(currentUser);
+        console.log("set this to current user ", currentUser);
+        
+        let payload = {
+          addr: currentUser.addr,
+          cid: currentUser.cid,
+          loggedIn: currentUser.loggedIn
+        }
+
+        let resp = await invoke("store_user_data", { userData: JSON.stringify(payload) });
+        console.log("this is the response from the store_user_data", resp);
+        setIsLoading(false);
       });
-      setUser(user)
+
     } catch (err) {
       console.error("Authentication failed:", err);
       // setError("Authentication failed. Please try again.");
@@ -64,6 +156,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     fcl.unauthenticate();
+    setUser({ addr: "", loggedIn: false });
   };
 
   const readUser = () => {

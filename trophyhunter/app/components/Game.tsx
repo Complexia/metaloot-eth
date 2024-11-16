@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import Map from './Map'
 import Character from './Character'
 import Trophy from './Trophy'
+import { open } from '@tauri-apps/plugin-shell'
+
+import { invoke } from '@tauri-apps/api/core';
+
 
 export type Position = {
   x: number
@@ -18,6 +22,27 @@ export const Game = () => {
   const [trophyPos, setTrophyPos] = useState<Position | null>(null)
   const [hasTrophy, setHasTrophy] = useState(false)
   const [terrain, setTerrain] = useState<TerrainType[][]>([])
+  const [user, setUser] = useState<any | null>(null)
+  const [userError, setUserError] = useState<string | null>(null)
+
+  // Add user fetch effect
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/server/get-user-data');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const userData = await response.json();
+        setUser(userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setUserError(error instanceof Error ? error.message : 'Failed to fetch user data');
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   // Initialize terrain and trophy position
   useEffect(() => {
@@ -93,8 +118,17 @@ export const Game = () => {
             Math.pow(newY - trophyPos.y, 2)
           )
           if (trophyDistance < 20) {
-            setHasTrophy(true)
-            setTrophyPos(null)
+            // Call metaloot and handle the response
+            open("metaloot://callback/add-item?name=Sword&type=weapon&rarity=rare")
+              .then(() => {
+                setHasTrophy(true)
+                setTrophyPos(null)
+                // Show success message or trigger animation
+              })
+              .catch(error => {
+                console.error("Failed to open metaloot:", error)
+                // Show error message to user
+              });
           }
         }
 
@@ -107,13 +141,40 @@ export const Game = () => {
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
+      {/* User Info Section */}
+      <div className="w-[500px] mb-4">
+        {userError ? (
+          <div className="p-3 bg-red-100 text-red-700 rounded-md">
+            {userError}
+          </div>
+        ) : user ? (
+          <div className="p-3 bg-blue-100 text-blue-700 rounded-md">
+            <p>Player Address: {user.addr}</p>
+            {user.cid && <p>CID: {user.cid}</p>}
+          </div>
+        ) : (
+          <div className="p-3 bg-gray-100 text-gray-700 rounded-md">
+            Loading player details...
+          </div>
+        )}
+      </div>
+
+      {/* Existing Game UI */}
       <div className="relative w-[500px] h-[500px] border-2 border-gray-400" onClick={handleMapClick}>
         <Map terrain={terrain} />
         <Character position={characterPos} hasTrophy={hasTrophy} />
         {trophyPos && <Trophy position={trophyPos} />}
       </div>
-      {hasTrophy && (
-        <div className="text-xl text-success">You got the trophy! 🏆</div>
+      
+      {/* Trophy Status Message */}
+      {hasTrophy ? (
+        <div className="text-xl text-success">
+          You got the trophy! 🏆 Your rare sword has been added to your inventory.
+        </div>
+      ) : (
+        <div className="text-sm text-gray-600">
+          Find and collect the trophy to receive a rare sword!
+        </div>
       )}
     </div>
   )

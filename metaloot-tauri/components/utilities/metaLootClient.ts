@@ -1,6 +1,8 @@
 import { getUser } from "./nftStorageCheck";
 import * as fcl from "@onflow/fcl";
-
+// import express from 'express';
+// import metaLootRoutes from './metalootRoutes';
+import { listen } from '@tauri-apps/api/event'
 
 
 
@@ -40,7 +42,135 @@ export interface User {
     f_vsn?: string;
     loggedIn?: boolean;
     services?: Array<object>;
-  }
+}
+
+// Extract and export the processUrl function
+export const processUrl = (url: string, user: User | null) => {
+    try {
+        // const urlObj = new URL(url);
+        // const path = urlObj.pathname.toLowerCase();
+        // const queryParams = Object.fromEntries(urlObj.searchParams);
+
+        // if (!user || !user.loggedIn) {
+        //     return {
+        //         action: 'error',
+        //         error: 'Please login with Flow wallet'
+        //     };
+        // }
+
+        let path = url;
+
+        console.log("PATH1", path)
+
+        
+
+        if (path === 'get-stored-user') {
+            console.log('Getting stored user info...');
+            // Handle user retrieval logic
+            // if (user.addr) {
+            //     getUser(user.addr);
+            // } else {
+            //     console.error('Address parameter is required for get-user endpoint');
+            // }
+            return {
+                action: 'get-stored-user',
+                user: user
+            };
+        }
+
+        // if (path === 'get-user') {
+        //     console.log('Getting user info...');
+        //     // Handle user retrieval logic
+        //     if (user.addr) {
+        //         getUser(user.addr);
+        //     } else {
+        //         console.error('Address parameter is required for get-user endpoint');
+        //     }
+        //     return {
+        //         action: 'get-user',
+        //         user: user.addr
+        //     };
+        // }
+
+        if (path == 'read-item-meta') {
+            console.log('Reading item metadata...');
+            // Handle item metadata reading
+            return {
+                action: 'read-item-meta',
+            };
+        }
+
+        //handle start game logic
+        if (path == 'start-game') {
+            console.log('Starting new game session...');
+            let currentUser = fcl.currentUser();
+            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+                console.log("this is sub user ", currentUser);
+
+                
+              });
+
+            console.log("currentUser inside start game", currentUser);
+            return {
+                action: 'start-game',
+                user: currentUser
+            };
+        }
+
+        if (path == 'end-game') {
+            console.log('Ending game session...');
+
+            console.log('Starting new game session...');
+            let currentUser = fcl.currentUser();
+            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+                console.log("this is sub user ", currentUser);
+
+                
+              });
+
+            console.log("currentUser inside start game", currentUser);
+
+            // Handle game end logic
+            return {
+                action: 'end-game',
+            };
+        }
+
+        if (path == 'add-item') {
+            console.log('Adding new item...');
+            // Handle item addition logic
+
+            console.log('Starting new game session...');
+            let currentUser = fcl.currentUser();
+            const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+                console.log("this is sub user ", currentUser);
+
+                
+              });
+
+            console.log("currentUser inside start game", currentUser);
+            
+
+            return {
+                action: 'add-item',
+                // params: queryParams
+            };
+        }
+
+        console.warn('Unknown endpoint:', path);
+        return {
+            action: 'unknown',
+            path: path
+        };
+
+    } catch (error) {
+        console.error('Error processing URL:', error);
+        return {
+            action: 'error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+};
 
 export default function metaLootClient(urls: string[], user: User | null): MetaLootResponse {
     console.log('🌟 Welcome to MetaLoot - Your Gateway to Web3! 🚀\n',
@@ -49,6 +179,12 @@ export default function metaLootClient(urls: string[], user: User | null): MetaL
         '✨ Building the Future of Digital Assets ✨'
     );
     // Check if user is logged in
+    console.log("user inside metaLootClient ", user);
+
+    
+
+   
+
     if (!user || !user.loggedIn) {
         return {
             data: "Please login with Flow wallet",
@@ -56,79 +192,8 @@ export default function metaLootClient(urls: string[], user: User | null): MetaL
             status: "error",
         };
     }
-    // Parse URL path and query parameters
-    const processUrl = (url: string) => {
-        try {
-            const urlObj = new URL(url);
-            const path = urlObj.pathname.toLowerCase();
-            const queryParams = Object.fromEntries(urlObj.searchParams);
 
-            if (path.includes('get-user')) {
-                console.log('Getting user info...');
-                // Handle user retrieval logic
-                if (user.addr) {
-                    getUser(user.addr);
-                } else {
-                    console.error('Address parameter is required for get-user endpoint');
-                }
-                return {
-                    action: 'get-user',
-                    params: queryParams
-                };
-            }
-
-            if (path.includes('read-item-meta')) {
-                console.log('Reading item metadata...');
-                // Handle item metadata reading
-                return {
-                    action: 'read-item-meta',
-                    params: queryParams
-                };
-            }
-
-            if (path.includes('start-game')) {
-                console.log('Starting new game session...');
-                // Handle game start logic
-                return {
-                    action: 'start-game',
-                    params: queryParams
-                };
-            }
-
-            if (path.includes('end-game')) {
-                console.log('Ending game session...');
-                // Handle game end logic
-                return {
-                    action: 'end-game',
-                    params: queryParams
-                };
-            }
-
-            if (path.includes('add-item')) {
-                console.log('Adding new item...', queryParams);
-                // Handle item addition logic
-                return {
-                    action: 'add-item',
-                    params: queryParams
-                };
-            }
-
-            console.warn('Unknown endpoint:', path);
-            return {
-                action: 'unknown',
-                path: path
-            };
-
-        } catch (error) {
-            console.error('Error processing URL:', error);
-            return {
-                action: 'error',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            };
-        }
-    };
-
-    const results = urls.map(processUrl);
+    const results = urls.map(url => processUrl(url, user));
     return {
         data: results,
         timestamp: new Date().toISOString(),
