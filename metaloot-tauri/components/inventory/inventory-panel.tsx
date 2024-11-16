@@ -7,6 +7,7 @@ import InventoryCard from './inventory-card';
 import * as fcl from "@onflow/fcl";
 import { getAllItem } from '../utilities/nftStorageCheck';
 import { User } from '../utilities/metaLootClient';
+import { invoke } from '@tauri-apps/api/core';
 // interface GamesPanelProps {
 //   games: Game[];
 // }
@@ -18,6 +19,12 @@ export const InventoryPanel = () => {
     const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
       console.log("user ", currentUser);
       let items = await getAllItem(currentUser.addr);
+      // Store the NFT data in the backend
+      try {
+        await invoke('store_user_nft_data', { userNftData: JSON.stringify(items) });
+      } catch (error) {
+        console.error('Failed to store NFT data:', error);
+      }
       setItems(items);
     });
 

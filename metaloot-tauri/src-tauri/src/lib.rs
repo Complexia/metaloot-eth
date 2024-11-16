@@ -185,11 +185,13 @@ struct UserData {
 #[derive(Debug, Serialize, Deserialize)]
 struct UserNFTData {
     id: String,
-    #[serde(rename = "itemName")]
-    item_name: String,
-    #[serde(rename = "itemType")]
-    item_type: String,
-    attributes: ItemAttributes,
+    uuid: String,
+    // #[serde(rename = "itemName")]
+    name: String,
+    // #[serde(rename = "itemType")]
+    description: String,
+    attributes: serde_json::Value,
+    metadata: serde_json::Value,
     thumbnail: String,
 }
 
@@ -206,7 +208,7 @@ static GLOBAL_APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 // Change OnceLock to Mutex for mutability
 static GLOBAL_USER_DATA: Lazy<Mutex<Option<UserData>>> = Lazy::new(|| Mutex::new(None));
 
-static GLOBAL_USER_NFT_DATA: Lazy<Mutex<Option<UserNFTData>>> = Lazy::new(|| Mutex::new(None));
+static GLOBAL_USER_NFT_DATA: Lazy<Mutex<Option<Vec<UserNFTData>>>> = Lazy::new(|| Mutex::new(None));
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -303,13 +305,21 @@ async fn end_game() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[get("/item")]
+#[get("/item/add")]
 async fn add_item() -> impl Responder {
-    println!("/item");
+    println!("/item/add");
     GLOBAL_APP_HANDLE
         .get()
         .unwrap()
-        .emit("add-item", "")
+        .emit("add-item", serde_json::json!({
+            "itemName": "something",
+            "itemType": "123",
+            "attributes": serde_json::json!({
+                "attack":"100",
+                "defense":3
+            }),
+            "thumpNail": "",
+        }))
         .unwrap();
     HttpResponse::Ok().finish()
 }
@@ -336,7 +346,7 @@ fn store_user_data(user_data: String) -> Result<(), String> {
 fn store_user_nft_data(user_nft_data: String) -> Result<(), String> {
     println!("{:#?} storing user nft data", user_nft_data);
 
-    let user_nft_data: UserNFTData = serde_json::from_str(&user_nft_data)
+    let user_nft_data: Vec<UserNFTData> = serde_json::from_str(&user_nft_data)
         .map_err(|e| {
             eprintln!("Deserialization error: {}", e);
             format!("Failed to deserialize user nft data: {}", e)
