@@ -47,7 +47,7 @@ export default function Game() {
             nftData.forEach((nft: any) => {
                 console.log("nft: ", nft)
                 console.log("nft name: ", nft.name)
-                if (nft.name === "Mystical Sword") {
+                if (nft.name === "2pac") {
                     setNameTag("Champion");
                 }
             });
@@ -208,7 +208,7 @@ export default function Game() {
             ctx.fillRect(newPlayer.x, newPlayer.y, newPlayer.width, newPlayer.height);
 
             // Draw player name
-            ctx.fillStyle = '#000';
+            ctx.fillStyle = '#FF0000';
             ctx.font = '14px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(nameTag, newPlayer.x + newPlayer.width / 2, newPlayer.y - 10);

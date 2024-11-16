@@ -146,7 +146,7 @@ export const Game = () => {
             Math.pow(newY - trophyPos.y, 2)
           )
           if (trophyDistance < 20) {
-            fetch('/server/item')
+            fetch('/server/item/add')
               .then(() => {
                 setHasTrophy(true)
                 setTrophyPos(null)

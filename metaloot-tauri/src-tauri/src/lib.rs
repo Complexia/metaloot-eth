@@ -330,7 +330,7 @@ async fn add_item() -> impl Responder {
         .get()
         .unwrap()
         .emit("add-item", serde_json::json!({
-            "itemName": "something",
+            "itemName": "2pac",
             "itemType": "123",
             "attributes": serde_json::json!({
                 "attack":"100",
