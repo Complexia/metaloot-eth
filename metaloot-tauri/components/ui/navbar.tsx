@@ -6,7 +6,7 @@ import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import { addItem, startGame, stopGame, userStorageCheck } from '@/components/utilities/nftStorageCheck';
+import { addItem, mintNFT, startGame, stopGame, userStorageCheck } from '@/components/utilities/nftStorageCheck';
 import { useUser } from '../context/UserContext';
 import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
 import { listen } from '@tauri-apps/api/event'
@@ -75,7 +75,7 @@ const Navbar = ({ updateTab }) => {
           attributes: object,
           thumpNail: string
         };
-        addItem(payload.itemName, payload.itemType, payload.attributes, payload.thumpNail);
+        mintNFT(payload.itemName, payload.itemType, payload.attributes, payload.thumpNail);
         // console.log("this is the user here", user);
         // let resp = processUrl(event.event as string, user);
         // let response_p = {
