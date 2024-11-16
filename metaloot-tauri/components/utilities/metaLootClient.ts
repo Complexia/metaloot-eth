@@ -1,4 +1,4 @@
-import { getUser } from "./nftStorageCheck";
+import { getUser, userStorageCheck } from "./nftStorageCheck";
 import * as fcl from "@onflow/fcl";
 // import express from 'express';
 // import metaLootRoutes from './metalootRoutes';
@@ -106,9 +106,19 @@ export const processUrl = (url: string, user: User | null) => {
             let currentUser = fcl.currentUser();
             const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
                 console.log("this is sub user ", currentUser);
+                console.log("this is user ", currentUser);
+                if (currentUser.loggedIn) {
+                  // Ensure account is set up to receive NFTs
+          
+                  await userStorageCheck();
+                  // setError(""); // Clear any previous errors
+                
 
+                }
                 
               });
+
+              
 
             console.log("currentUser inside start game", currentUser);
             return {
@@ -148,8 +158,10 @@ export const processUrl = (url: string, user: User | null) => {
                 
               });
 
+             
+
             console.log("currentUser inside start game", currentUser);
-            
+
 
             return {
                 action: 'add-item',

@@ -7,5 +7,17 @@ interface Game {
     // Add other game properties as needed
   }
 
+  interface InventoryItem {
+    id: string;
+    itemName: string;
+    itemType: string;
+    attributes: {
+      rarity: string;
+      originGame: string;
+      description: string;
+    };
+    thumbnail: string;
+  }
 
-export type { Game };
+
+export type { Game, InventoryItem };

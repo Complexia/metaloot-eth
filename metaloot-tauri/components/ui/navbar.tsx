@@ -13,7 +13,7 @@ import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core';
 // Define the User type based on FCL's user state
 
-const Navbar: React.FC = () => {
+const Navbar = ({updateTab}) => {
   const { user, setUser } = useUser();
 
   useEffect(() => {
@@ -94,31 +94,31 @@ const Navbar: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   //const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
-  useEffect(() => {
+  // useEffect(() => {
     
-    // Subscribe to user state'
-    //"@ts-expect-error"
-    const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
-      setIsLoading(true);
-      console.log("this is user ", currentUser);
-      if (currentUser.loggedIn) {
-        setUser(currentUser);
-        // Ensure account is set up to receive NFTs
+  //   // Subscribe to user state'
+  //   //"@ts-expect-error"
+  //   const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
+  //     setIsLoading(true);
+  //     console.log("this is user ", currentUser);
+  //     if (currentUser.loggedIn) {
+  //       setUser(currentUser);
+  //       // Ensure account is set up to receive NFTs
 
-        await userStorageCheck();
-        setIsLoading(false);
-        // setError(""); // Clear any previous errors
-      } else {
-        setIsLoading(false);
-        setUser({ addr: "", loggedIn: false });
-      }
-    });
+  //       await userStorageCheck();
+  //       setIsLoading(false);
+  //       // setError(""); // Clear any previous errors
+  //     } else {
+  //       setIsLoading(false);
+  //       setUser({ addr: "", loggedIn: false });
+  //     }
+  //   });
 
-    // Cleanup subscription on unmount
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  //   // Cleanup subscription on unmount
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   useEffect(() => {
 
@@ -205,10 +205,11 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Second sector: Navigation Links */}
+          
           <div className="flex-none">
             <ul className="menu menu-horizontal px-1">
-              <li><Link href="/games">Games</Link></li>
-              <li><Link href="/inventory">Inventory</Link></li>
+              <li><span onClick={() => updateTab("games")}>Games</span></li>
+              <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
               <li><Link href="/shop">Shop</Link></li>
             </ul>
           </div>

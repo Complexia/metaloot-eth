@@ -24,28 +24,52 @@ export const Game = () => {
   const [terrain, setTerrain] = useState<TerrainType[][]>([])
   const [user, setUser] = useState<any | null>(null)
   const [userError, setUserError] = useState<string | null>(null)
+  const [isGameStarted, setIsGameStarted] = useState(false)
+  const [gameMetadata, setGameMetadata] = useState<any>(null)
+
+  // Move fetchUser outside useEffect
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('/server/get-user-data');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const userData = await response.json();
+      setUser(userData);
+      setUserError(null); // Clear any previous errors
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUserError(error instanceof Error ? error.message : 'Failed to fetch user data');
+    }
+  }
 
   // Add user fetch effect
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('/server/get-user-data');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const userData = await response.json();
-        setUser(userData);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setUserError(error instanceof Error ? error.message : 'Failed to fetch user data');
-      }
-    }
-
     fetchUser()
   }, [])
 
-  // Initialize terrain and trophy position
-  useEffect(() => {
+  // Move the terrain initialization into a separate function
+  const initializeGame = async () => {
+    if (!user) {
+      setUserError("Please log in with Metaloot to play")
+      return
+    }
+
+    try {
+      const response = await fetch('/server/game/start');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log("game metadata raw: ", response);
+      // const gameMetadata = await response.json();
+      // setGameMetadata(gameMetadata);
+    } catch (error) {
+      console.error('Error fetching game metadata:', error);
+      setUserError(error instanceof Error ? error.message : 'Failed to fetch game metadata');
+    }
+
+
+
     const newTerrain: TerrainType[][] = Array(10).fill(null).map(() =>
       Array(10).fill(null).map(() => {
         const random = Math.random()
@@ -54,11 +78,9 @@ export const Game = () => {
         return 'river'
       })
     )
-    // Ensure starting position is grass
     newTerrain[5][5] = 'grass'
     setTerrain(newTerrain)
 
-    // Place trophy randomly on grass
     let tx, ty
     do {
       tx = Math.floor(Math.random() * 10)
@@ -66,7 +88,11 @@ export const Game = () => {
     } while (newTerrain[ty][tx] !== 'grass')
     
     setTrophyPos({ x: tx * 50, y: ty * 50 })
-  }, [])
+    setCharacterPos({ x: 50, y: 50 }) // Reset character position
+    setHasTrophy(false) // Reset trophy state
+    setTargetPos(null) // Reset target position
+    setIsGameStarted(true)
+  }
 
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -119,7 +145,7 @@ export const Game = () => {
           )
           if (trophyDistance < 20) {
             // Call metaloot and handle the response
-            open("metaloot://callback/add-item?name=Sword&type=weapon&rarity=rare")
+            fetch('/server/item') 
               .then(() => {
                 setHasTrophy(true)
                 setTrophyPos(null)
@@ -144,8 +170,14 @@ export const Game = () => {
       {/* User Info Section */}
       <div className="w-[500px] mb-4">
         {userError ? (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md">
+          <div className="p-3 bg-red-100 text-red-700 rounded-md flex justify-between items-center">
             {userError}
+            <button 
+              onClick={() => fetchUser()} 
+              className="ml-4 px-3 py-1 bg-red-200 hover:bg-red-300 rounded-md transition-colors"
+            >
+              Retry
+            </button>
           </div>
         ) : user ? (
           <div className="p-3 bg-blue-100 text-blue-700 rounded-md">
@@ -159,22 +191,43 @@ export const Game = () => {
         )}
       </div>
 
-      {/* Existing Game UI */}
-      <div className="relative w-[500px] h-[500px] border-2 border-gray-400" onClick={handleMapClick}>
-        <Map terrain={terrain} />
-        <Character position={characterPos} hasTrophy={hasTrophy} />
-        {trophyPos && <Trophy position={trophyPos} />}
+      {/* Game Content */}
+      <div className="w-[500px] h-[500px] border-2 border-gray-400">
+        {!isGameStarted ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+            <button
+              onClick={initializeGame}
+              className="px-8 py-4 text-xl font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+              disabled={!user}
+            >
+              Start Game
+            </button>
+            {!user && (
+              <p className="text-red-600">
+                Make sure you're logged in with Metaloot to play
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="relative w-full h-full" onClick={handleMapClick}>
+            <Map terrain={terrain} />
+            <Character position={characterPos} hasTrophy={hasTrophy} />
+            {trophyPos && <Trophy position={trophyPos} />}
+          </div>
+        )}
       </div>
       
       {/* Trophy Status Message */}
-      {hasTrophy ? (
-        <div className="text-xl text-success">
-          You got the trophy! 🏆 Your rare sword has been added to your inventory.
-        </div>
-      ) : (
-        <div className="text-sm text-gray-600">
-          Find and collect the trophy to receive a rare sword!
-        </div>
+      {isGameStarted && (
+        hasTrophy ? (
+          <div className="text-xl text-success">
+            You got the trophy! 🏆 Your rare sword has been added to your inventory.
+          </div>
+        ) : (
+          <div className="text-sm text-gray-600">
+            Find and collect the trophy to receive a rare sword!
+          </div>
+        )
       )}
     </div>
   )
