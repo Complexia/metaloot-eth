@@ -33,14 +33,15 @@ const InventoryCard = (item: InventoryItem) => {
             className="card bg-base-100 shadow-xl  h-96 cursor-pointer">
             <figure className="h-1/2">
                 <img
-                    src={item.thumbnail}
+                    // src={item.thumbnail}
+                    src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/box.jpg"
                     alt="Shoes"
                     className="w-full h-full object-cover"
                 />
             </figure>
             <div className="card-body h-1/2 flex flex-col">
                 <h2 className="card-title text-lg">
-                    {truncateText(item.itemName, 30)}
+                    {truncateText(item.name || "", 30)}
                     <div className="badge badge-secondary">item</div>
                 </h2>
                 <p className="flex-grow overflow-hidden">

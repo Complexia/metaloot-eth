@@ -12,6 +12,7 @@ interface Game {
     uuid: string;
     description: string;
     itemName: string;
+    name?: string;
     itemType: string;
     attributes: object;
     metadata: object;
