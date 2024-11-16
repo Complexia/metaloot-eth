@@ -182,10 +182,31 @@ struct UserData {
     logged_in: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct UserNFTData {
+    id: String,
+    #[serde(rename = "itemName")]
+    item_name: String,
+    #[serde(rename = "itemType")]
+    item_type: String,
+    attributes: ItemAttributes,
+    thumbnail: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ItemAttributes {
+    rarity: String,
+    #[serde(rename = "originGame")]
+    origin_game: String,
+    description: String,
+}
+
 static GLOBAL_APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 
 // Change OnceLock to Mutex for mutability
 static GLOBAL_USER_DATA: Lazy<Mutex<Option<UserData>>> = Lazy::new(|| Mutex::new(None));
+
+static GLOBAL_USER_NFT_DATA: Lazy<Mutex<Option<UserNFTData>>> = Lazy::new(|| Mutex::new(None));
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -226,6 +247,28 @@ async fn get_user_data() -> impl Responder {
     }
 }
 
+#[get("/get-user-nfts")]
+async fn get_user_nfts() -> impl Responder {
+    let result = || -> Result<String, String> {
+        let data = GLOBAL_USER_NFT_DATA
+            .lock()
+            .map_err(|_| "Failed to lock global user nft data".to_string())?;
+        
+        match &*data {
+            Some(user_data) => {
+                serde_json::to_string(&user_data)
+                    .map_err(|e| format!("Failed to serialize user nft data: {}", e))
+            },
+            None => Err("No user data nft found".to_string())
+        }
+    }();
+
+    match result {
+        Ok(json) => HttpResponse::Ok().content_type("application/json").body(json),
+        Err(e) => HttpResponse::InternalServerError().body(e)
+    }
+}
+
 
 #[get("/item/{item_id}/metadata")]
 async fn get_item_metadata(path: actix_web::web::Path<String>) -> impl Responder {
@@ -249,13 +292,13 @@ async fn start_game() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[get("/game/{session_id}/end")]
-async fn end_game(path: actix_web::web::Path<String>) -> impl Responder {
-    println!("/game/{}/end", path);
+#[get("/game/end")]
+async fn end_game() -> impl Responder {
+    
     GLOBAL_APP_HANDLE
         .get()
         .unwrap()
-        .emit("end-game", &path.into_inner())
+        .emit("end-game", "")
         .unwrap();
     HttpResponse::Ok().finish()
 }
@@ -286,6 +329,24 @@ fn store_user_data(user_data: String) -> Result<(), String> {
         .lock()
         .map_err(|_| "Failed to lock global user data".to_string())?;
     *data = Some(user_data);
+    Ok(())
+}
+
+#[tauri::command]
+fn store_user_nft_data(user_nft_data: String) -> Result<(), String> {
+    println!("{:#?} storing user nft data", user_nft_data);
+
+    let user_nft_data: UserNFTData = serde_json::from_str(&user_nft_data)
+        .map_err(|e| {
+            eprintln!("Deserialization error: {}", e);
+            format!("Failed to deserialize user nft data: {}", e)
+        })?;
+      
+    println!("Deserialized user nft data: {:?}", user_nft_data);
+    let mut data = GLOBAL_USER_NFT_DATA
+        .lock()
+        .map_err(|_| "Failed to lock global user nft data".to_string())?;
+    *data = Some(user_nft_data);
     Ok(())
 }
 
@@ -341,7 +402,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_deep_link::init())
-        .invoke_handler(tauri::generate_handler![store_user_data, get_user_data_from_store])
+        .invoke_handler(tauri::generate_handler![store_user_data, get_user_data_from_store, store_user_nft_data])
         .setup(|app| {
             app.handle();
             // Start Actix web server
@@ -357,6 +418,7 @@ pub fn run() {
                         .service(end_game)
                         .service(add_item)
                         .service(get_user_data)
+                        .service(get_user_nfts)
                         
                 })
                 .bind(("127.0.0.1", 8080))

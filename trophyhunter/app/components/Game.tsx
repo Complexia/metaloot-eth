@@ -128,39 +128,38 @@ export const Game = () => {
         const dy = targetPos.y - current.y
         const distance = Math.sqrt(dx * dx + dy * dy)
 
+        // Stop moving if we're close enough to target
         if (distance < 2) {
           clearInterval(interval)
-          return targetPos
+          setTargetPos(null) // Clear the target once reached
+          return current // Keep current position
         }
 
-        const speed = 2
+        const speed = 2 // Increased speed to reduce number of updates
         const newX = current.x + (dx / distance) * speed
         const newY = current.y + (dy / distance) * speed
 
-        // Check if character reached trophy
+        // Check trophy collection only when very close
         if (trophyPos && !hasTrophy) {
           const trophyDistance = Math.sqrt(
             Math.pow(newX - trophyPos.x, 2) + 
             Math.pow(newY - trophyPos.y, 2)
           )
           if (trophyDistance < 20) {
-            // Call metaloot and handle the response
-            fetch('/server/item') 
+            fetch('/server/item')
               .then(() => {
                 setHasTrophy(true)
                 setTrophyPos(null)
-                // Show success message or trigger animation
               })
               .catch(error => {
                 console.error("Failed to open metaloot:", error)
-                // Show error message to user
               });
           }
         }
 
         return { x: newX, y: newY }
       })
-    }, 16)
+    }, 33) // Reduced update frequency (approximately 30 FPS instead of 60)
 
     return () => clearInterval(interval)
   }, [targetPos, trophyPos, hasTrophy])
