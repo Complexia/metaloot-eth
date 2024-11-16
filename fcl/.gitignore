@@ -38,3 +38,5 @@ next-env.d.ts
 testnet-account.private.json
 
 emulator.key
+testnet-account.private.json
+patrick@saturnlabs.dev.pkey

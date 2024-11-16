@@ -1,10 +1,24 @@
 {
 	"contracts": {
-		"GameSession": "cadence/contracts/GameSession.cdc",
+		"GameSession": {
+			"source": "cadence/contracts/GameSession.cdc",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "f233dcee88fe0abe",
+				"testnet": "ceed54f46d4b1942"
+			}
+		},
 		"HelloWorld": "cadence/contracts/HelloWorld.cdc",
 		"ItemNFTInterface": "cadence/contracts/ItemNFTInterface.cdc",
 		"Marketplace": "cadence/contracts/MarketPlace.cdc",
-		"MetaLootNFT": "cadence/contracts/MetalootNFT.cdc",
+		"MetaLootNFT": {
+			"source": "cadence/contracts/MetalootNFT.cdc",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "f233dcee88fe0abe",
+				"testnet": "ceed54f46d4b1942"
+			}
+		},
 		"MetaLootNFT2": "cadence/contracts/template.cdc"
 	},
 	"dependencies": {
@@ -83,19 +97,13 @@
 	"deployments": {
 		"emulator": {
 			"default": [
-				"GameSession",
-				"HelloWorld",
-				"ItemNFTInterface",
-				"Marketplace",
-				"MetaLootNFT",
-				"MetaLootNFT2"
 			]
 		},
 		"testnet": {
 			"patrick@saturnlabs.dev": [
-				"HelloWorld",
 				"GameSession",
-				"MetaLootNFT"
+				"MetaLootNFT",
+				"HelloWorld"
 			]
 		}
 	}

@@ -325,6 +325,15 @@ access(all) contract MetaLootNFT: NonFungibleToken {
         }
         return nil
     }
+    
+    /// Function that resolves a metadata view for this contract.
+    ///
+    /// @param view: The Type of the desired view.
+    /// @return A structure representing the requested view.
+    ///
+    access(all) fun createNFTMinter(): @NFTMinter {
+        return <-create NFTMinter()
+    }
 
     /// Resource that an admin or something similar would own to be
     /// able to mint new NFTs
