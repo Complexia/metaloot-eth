@@ -2,13 +2,15 @@
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "Trophy Hunter",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.trophyhunter.dev",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3001",
     "beforeDevCommand": "bun dev",
-    "beforeBuildCommand": "bun build"
+    "beforeBuildCommand": "npm run build"
   },
+
+
   "app": {
     "windows": [
       {

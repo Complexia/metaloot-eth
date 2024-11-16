@@ -233,6 +233,7 @@ const Navbar = ({ updateTab }) => {
             <ul className="menu menu-horizontal px-1">
               <li><span onClick={() => updateTab("games")}>Games</span></li>
               <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
+              <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
               <li><Link href="/shop">Shop</Link></li>
             </ul>
           </div>

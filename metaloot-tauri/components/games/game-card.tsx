@@ -1,20 +1,25 @@
 "use client";
 
 import { Game } from "@/components/types";
-import { open } from '@tauri-apps/plugin-shell'
+import { open, Command } from '@tauri-apps/plugin-shell'
 
 
 const GameCard = (game: Game) => {
     // Function to open external URI using Tauri shell
     const openExternalUri = async () => {
-        try {
-            console.error('Try to open URI:', game.uri);
-            await open(game.uri);
-        } catch (error) {
-            console.error('Failed to open URI:', error);
-            // Fallback to window.open for web
-            window.open(game.uri, '_blank');
-        }
+        // try {
+        //     // Execute the cd command in a new terminal window
+        //     const cdOutput = await Command.sidecar('run-trophyhunter')
+        //         .execute();
+        //     console.log('CD command output:', cdOutput);
+            
+        //     // Execute cargo tauri dev in a new terminal window
+        //     const cargoOutput = await Command.sidecar('run-cargo-tauri')
+        //         .execute();
+        //     console.log('Cargo command output:', cargoOutput);
+        // } catch (error) {
+        //     console.error('Failed to execute command:', error);
+        // }
     };
     // Function to truncate text
     const truncateText = (text: string, maxLength: number) => {

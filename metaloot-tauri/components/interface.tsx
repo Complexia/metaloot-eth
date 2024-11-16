@@ -5,8 +5,7 @@ import { GamesPanel } from '@/components/games/games-panel';
 import Navbar from '@/components/ui/navbar';
 import { useState } from 'react';
 import { InventoryPanel } from './inventory/inventory-panel';
-
-
+import { TransactionsPanel } from './transactions/transactions-panel';
 
 const Interface: React.FC = () => {
 
@@ -29,9 +28,9 @@ const Interface: React.FC = () => {
             <GamesPanel />
           ) : tab === "inventory" ? (
             <InventoryPanel />
+          ) : tab === "transactions" ? (
+            <TransactionsPanel />
           ) : null}
-        
-          
         </div>
       </div>
     </div>

@@ -10,6 +10,22 @@
     "shell:default",
     "shell:allow-open",
     "deep-link:default",
-    "deep-link:allow-register"
+    "deep-link:allow-register",
+    "shell:allow-execute",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "run-trophyhunter",
+          "cmd": "cd",
+          "args": ["/Users/remi/Desktop/everything/projectsalpha/metaloot-eth/repo/trophyhunter"]
+        },
+        {
+          "name": "run-cargo-tauri",
+          "cmd": "cargo",
+          "args": ["tauri", "dev"]
+        }
+      ]
+    }
   ]
 }
