@@ -185,22 +185,19 @@ struct UserData {
 #[derive(Debug, Serialize, Deserialize)]
 struct UserNFTData {
     id: String,
-    uuid: String,
-    // #[serde(rename = "itemName")]
     name: String,
-    // #[serde(rename = "itemType")]
-    description: String,
-    attributes: serde_json::Value,
-    metadata: serde_json::Value,
+    attributes: ItemAttributes,
     thumbnail: String,
+    description: Option<String>,
 }
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ItemAttributes {
-    rarity: String,
+    rarity: Option<String>,
     #[serde(rename = "originGame")]
-    origin_game: String,
-    description: String,
+    origin_game: Option<String>,
+    description: Option<String>,
 }
 
 static GLOBAL_APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
@@ -209,6 +206,8 @@ static GLOBAL_APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 static GLOBAL_USER_DATA: Lazy<Mutex<Option<UserData>>> = Lazy::new(|| Mutex::new(None));
 
 static GLOBAL_USER_NFT_DATA: Lazy<Mutex<Option<Vec<UserNFTData>>>> = Lazy::new(|| Mutex::new(None));
+
+static NFT_UPDATE_COMPLETED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -251,6 +250,25 @@ async fn get_user_data() -> impl Responder {
 
 #[get("/get-user-nfts")]
 async fn get_user_nfts() -> impl Responder {
+
+    println!("hello");
+    // Reset the completion flag
+    *NFT_UPDATE_COMPLETED.lock().unwrap() = false;
+
+    GLOBAL_APP_HANDLE
+        .get()
+        .unwrap()
+        .emit("get-user-nfts", "")
+        .unwrap();
+
+    // Wait for the update to complete (poll the flag)
+    while !*NFT_UPDATE_COMPLETED.lock().unwrap() {
+        // println!("yooo");
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+    }
+
+    println!("hello1");
+
     let result = || -> Result<String, String> {
         let data = GLOBAL_USER_NFT_DATA
             .lock()
@@ -344,8 +362,10 @@ fn store_user_data(user_data: String) -> Result<(), String> {
 
 #[tauri::command]
 fn store_user_nft_data(user_nft_data: String) -> Result<(), String> {
+    println!("we calling this function????");
     println!("{:#?} storing user nft data", user_nft_data);
 
+    
     let user_nft_data: Vec<UserNFTData> = serde_json::from_str(&user_nft_data)
         .map_err(|e| {
             eprintln!("Deserialization error: {}", e);
@@ -375,6 +395,12 @@ fn get_user_data_from_store() -> Result<String, String> {
     }
 }
 
+#[tauri::command]
+fn update_completed() -> Result<(), String> {
+    let mut completed = NFT_UPDATE_COMPLETED.lock().unwrap();
+    *completed = true;
+    Ok(())
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -412,7 +438,12 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_deep_link::init())
-        .invoke_handler(tauri::generate_handler![store_user_data, get_user_data_from_store, store_user_nft_data])
+        .invoke_handler(tauri::generate_handler![
+            store_user_data, 
+            get_user_data_from_store, 
+            store_user_nft_data,
+            update_completed
+        ])
         .setup(|app| {
             app.handle();
             // Start Actix web server
