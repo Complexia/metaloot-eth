@@ -230,7 +230,8 @@ const Navbar = ({ updateTab }) => {
               <li><span onClick={() => updateTab("games")}>Games</span></li>
               <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
               <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
-              <li><Link href="/shop">Shop</Link></li>
+              <li><span onClick={() => updateTab("shop")}>Shop</span></li>
+              
               <li><span onClick={() => transferNFT("0xdfc20aee650fcbdf", 278176441924202)}>Test Transfer</span></li>
 
             </ul>
