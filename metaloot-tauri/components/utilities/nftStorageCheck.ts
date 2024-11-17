@@ -1,6 +1,7 @@
 import * as fcl from "@onflow/fcl";
 import * as t from '@onflow/typedefs';
 import { User } from "./metaLootClient";
+import { invoke } from "@tauri-apps/api/core";
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║ Flow Client Library (FCL) Configuration                                    ║
@@ -388,10 +389,11 @@ transaction(itemName:String,itemType: String, attributes: {String: String}, thum
         arg(
           { key: "key1", value: "value1" }
           , t.Dictionary({ key: t.String, value: t.String })),
-        // arg(attributes, t.Dictionary({ key: t.String, value: t.String })),
         arg(thumpNail, t.String)
       ]
     });
+    let resp = await invoke("store_transaction", { transactionData: JSON.stringify(result) });
+    console.log("Transaction stored response:", resp);
     console.log("on-chain res: ", result);
   } catch (error) {
     console.error("on-chain err: ", error);
@@ -404,6 +406,7 @@ export async function mintNFT(itemName: string, itemType: string, attributes: ob
   // let nftContractAddress = "0xf8d6e0586b0a20c7";
   // Check if the user has the NFT receiver capability
   try {
+    
     const result = await fcl.mutate({
       cadence: `
 import NonFungibleToken from 0x631e88ae7f1d7c20
@@ -454,6 +457,7 @@ transaction(
         arg(thumpNail, t.String)
       ]
     });
+    await invoke('store_transaction', { transaction: result });
     console.log("on-chain res: ", result);
   } catch (error) {
     console.error("on-chain err: ", error);
@@ -509,5 +513,48 @@ fun main(address: Address): [&{NonFungibleToken.NFT}] {
   } catch (error) {
     console.error("on-chain err: ", error);
     // throw error;
+  }
+}
+
+export const transferNFT = async (recipientAddress: string, tokenId: number) => {
+  try {
+    const transactionId = await fcl.mutate({
+      cadence: `
+        import NonFungibleToken from 0x631e88ae7f1d7c20
+        import MetaLootNFT from 0xceed54f46d4b1942
+
+        transaction(recipient: Address, withdrawID: UInt64) {
+          prepare(acct: &Account) {
+            // Get the Collection reference from the signer
+            let collectionRef = signer.borrow<&MetaLootNFT.Collection>(
+              from: MetaLootNFT.CollectionStoragePath
+            ) ?? panic("Could not borrow Collection reference")
+
+            // Get the recipient's public account object
+            let recipientAccount = getAccount(recipient)
+
+            // Get the Collection reference from the recipient
+            let depositRef = recipientAccount.getCapability(MetaLootNFT.CollectionPublicPath)
+              .borrow<&{NonFungibleToken.CollectionPublic}>()
+              ?? panic("Could not borrow Collection receiver reference")
+
+            // Withdraw the NFT and deposit it to the recipient's Collection
+            let nft <- collectionRef.withdraw(withdrawID: withdrawID)
+            depositRef.deposit(token: <-nft)
+          }
+        }
+      `,
+      args: (arg, t) => [
+        arg(recipientAddress, t.Address),
+        arg(tokenId, t.UInt64)
+      ],
+      limit: 1000
+    });
+
+    console.log("Transfer transaction submitted:", transactionId);
+    return transactionId;
+  } catch (error) {
+    console.error("Error transferring NFT:", error);
+    throw error;
   }
 }

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import * as fcl from "@onflow/fcl";
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link'
 // Import Flow configuration
-import { addItem, mintNFT, startGame, stopGame, userStorageCheck } from '@/components/utilities/nftStorageCheck';
+import { addItem, mintNFT, startGame, stopGame, transferNFT, userStorageCheck } from '@/components/utilities/nftStorageCheck';
 import { useUser } from '../context/UserContext';
 import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
 import { listen } from '@tauri-apps/api/event'
@@ -25,7 +25,7 @@ const Navbar = ({ updateTab }) => {
       });
 
       await listen('get-stored-user', (event) => {
-        // invoke to BE if needed
+        // invoke to BE 
         return {
           action: 'get-stored-user',
           user: user
@@ -235,6 +235,8 @@ const Navbar = ({ updateTab }) => {
               <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
               <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
               <li><Link href="/shop">Shop</Link></li>
+              <li><span onClick={() => transferNFT("0xdfc20aee650fcbdf", 278176441924202)}>Test Transfer</span></li>
+
             </ul>
           </div>
 

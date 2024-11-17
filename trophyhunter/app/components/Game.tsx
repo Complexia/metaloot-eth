@@ -146,7 +146,21 @@ export const Game = () => {
             Math.pow(newY - trophyPos.y, 2)
           )
           if (trophyDistance < 20) {
-            fetch('/server/item/add')
+            let payload = {
+              
+                "itemName": "Spiritual Boost",
+                "itemType": "Rewards From The Sky",
+                "attributes": {
+                    "key": "Creativity",
+                    "value": "100%"
+                },
+                "thumpNail": "rgb(0, 255, 255)"
+            
+            }
+            fetch('/server/item/add', {
+              method: 'GET',
+              body: JSON.stringify(payload)
+            })
               .then(() => {
                 setHasTrophy(true)
                 setTrophyPos(null)

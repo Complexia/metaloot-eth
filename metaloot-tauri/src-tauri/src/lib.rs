@@ -209,6 +209,8 @@ static GLOBAL_USER_NFT_DATA: Lazy<Mutex<Option<Vec<UserNFTData>>>> = Lazy::new(|
 
 static NFT_UPDATE_COMPLETED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 
+static GLOBAL_TRANSACTIONS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| Mutex::new(Vec::new()));
+
 #[get("/")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
@@ -402,6 +404,27 @@ fn update_completed() -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn store_transaction(transaction: String) -> Result<(), String> {
+    println!("Storing transaction: {}", transaction);
+    
+    let mut transactions = GLOBAL_TRANSACTIONS
+        .lock()
+        .map_err(|_| "Failed to lock global transactions".to_string())?;
+    
+    transactions.push(transaction);
+    Ok(())
+}
+
+#[tauri::command]
+fn get_transactions() -> Result<Vec<String>, String> {
+    let transactions = GLOBAL_TRANSACTIONS
+        .lock()
+        .map_err(|_| "Failed to lock global transactions".to_string())?;
+    
+    Ok(transactions.clone())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // tauri::Builder::default()
@@ -442,7 +465,9 @@ pub fn run() {
             store_user_data, 
             get_user_data_from_store, 
             store_user_nft_data,
-            update_completed
+            update_completed,
+            store_transaction,
+            get_transactions
         ])
         .setup(|app| {
             app.handle();
