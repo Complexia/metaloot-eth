@@ -24,7 +24,6 @@ export const Game = () => {
   const [terrain, setTerrain] = useState<TerrainType[][]>([])
   const [user, setUser] = useState<any | null>(null)
   const [userError, setUserError] = useState<string | null>(null)
-  const [isGameStarted, setIsGameStarted] = useState(false)
   const [gameMetadata, setGameMetadata] = useState<any>(null)
 
   // Move fetchUser outside useEffect
@@ -48,28 +47,8 @@ export const Game = () => {
     fetchUser()
   }, [])
 
-  // Move the terrain initialization into a separate function
-  const initializeGame = async () => {
-    if (!user) {
-      setUserError("Please log in with Metaloot to play")
-      return
-    }
-
-    try {
-      const response = await fetch('/server/game/start');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      console.log("game metadata raw: ", response);
-      // const gameMetadata = await response.json();
-      // setGameMetadata(gameMetadata);
-    } catch (error) {
-      console.error('Error fetching game metadata:', error);
-      setUserError(error instanceof Error ? error.message : 'Failed to fetch game metadata');
-    }
-
-
-
+  // Initialize terrain immediately
+  useEffect(() => {
     const newTerrain: TerrainType[][] = Array(10).fill(null).map(() =>
       Array(10).fill(null).map(() => {
         const random = Math.random()
@@ -88,11 +67,8 @@ export const Game = () => {
     } while (newTerrain[ty][tx] !== 'grass')
     
     setTrophyPos({ x: tx * 50, y: ty * 50 })
-    setCharacterPos({ x: 50, y: 50 }) // Reset character position
-    setHasTrophy(false) // Reset trophy state
-    setTargetPos(null) // Reset target position
-    setIsGameStarted(true)
-  }
+    setCharacterPos({ x: 50, y: 50 })
+  }, []) // Run once on component mount
 
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -148,8 +124,8 @@ export const Game = () => {
           if (trophyDistance < 20) {
             let payload = {
               
-                "itemName": "Spiritual Boost",
-                "itemType": "Rewards From The Sky",
+                "itemName": "Boxing Gloves",
+                "itemType": "Gloves",
                 "attributes": {
                     "key": "Creativity",
                     "value": "100%"
@@ -158,8 +134,11 @@ export const Game = () => {
             
             }
             fetch('/server/item/add', {
-              method: 'GET',
-              body: JSON.stringify(payload)
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: {
+                'Content-Type': 'application/json'
+              }
             })
               .then(() => {
                 setHasTrophy(true)
@@ -177,6 +156,34 @@ export const Game = () => {
 
     return () => clearInterval(interval)
   }, [targetPos, trophyPos, hasTrophy])
+
+  // Add resetGame function
+  const resetGame = () => {
+    setHasTrophy(false)
+    setTargetPos(null)
+    
+    // Reset terrain and positions
+    const newTerrain: TerrainType[][] = Array(10).fill(null).map(() =>
+      Array(10).fill(null).map(() => {
+        const random = Math.random()
+        if (random < 0.7) return 'grass'
+        if (random < 0.85) return 'tree'
+        return 'river'
+      })
+    )
+    newTerrain[5][5] = 'grass'
+    setTerrain(newTerrain)
+
+    // Spawn new trophy on grass
+    let tx, ty
+    do {
+      tx = Math.floor(Math.random() * 10)
+      ty = Math.floor(Math.random() * 10)
+    } while (newTerrain[ty][tx] !== 'grass')
+    
+    setTrophyPos({ x: tx * 50, y: ty * 50 })
+    setCharacterPos({ x: 50, y: 50 })
+  }
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
@@ -204,44 +211,29 @@ export const Game = () => {
         )}
       </div>
 
-      {/* Game Content */}
+      {/* Game Content - Modified to always show map */}
       <div className="w-[500px] h-[500px] border-2 border-gray-400">
-        {!isGameStarted ? (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-            <button
-              onClick={initializeGame}
-              className="px-8 py-4 text-xl font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-              disabled={!user}
-            >
-              Start Game
-            </button>
-            {!user && (
-              <p className="text-red-600">
-                Make sure you're logged in with Metaloot to play
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="relative w-full h-full" onClick={handleMapClick}>
-            <Map terrain={terrain} />
-            <Character position={characterPos} hasTrophy={hasTrophy} />
-            {trophyPos && <Trophy position={trophyPos} />}
-          </div>
-        )}
+        <div className="relative w-full h-full" onClick={handleMapClick}>
+          <Map terrain={terrain} />
+          <Character position={characterPos} hasTrophy={hasTrophy} />
+          {trophyPos && <Trophy position={trophyPos} />}
+        </div>
       </div>
       
-      {/* Trophy Status Message */}
-      {isGameStarted && (
-        hasTrophy ? (
-          <div className="text-xl text-success">
-            You got the trophy! 🏆 Your rare sword has been added to your inventory.
-          </div>
-        ) : (
-          <div className="text-sm text-gray-600">
-            Find and collect the trophy to receive a rare sword!
-          </div>
-        )
-      )}
+      {/* Trophy Status and Reset Button */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-sm text-gray-600">
+          {hasTrophy 
+            ? "You got the trophy! 🏆 Your rare sword has been added to your inventory."
+            : "Find and collect the trophy to receive a rare sword!"}
+        </div>
+        <button 
+          onClick={resetGame}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Reset Game
+        </button>
+      </div>
     </div>
   )
 }

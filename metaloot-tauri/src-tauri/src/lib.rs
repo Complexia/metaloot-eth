@@ -326,7 +326,7 @@ async fn end_game() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[get("/item/add")]
+#[post("/item/add")]
 async fn add_item(item: web::Json<serde_json::Value>) -> impl Responder {
     println!("/item/add with payload: {:?}", item);
     GLOBAL_APP_HANDLE
