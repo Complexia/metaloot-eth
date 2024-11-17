@@ -2,12 +2,12 @@
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "Crazy Jumper",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.crazyjumper.dev",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3001",
+    "devUrl": "http://localhost:3000",
     "beforeDevCommand": "bun dev",
-    "beforeBuildCommand": "bun build"
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [
@@ -20,13 +20,27 @@
         "label": "main"
       }
     ],
-   "security": {
+    "security": {
       "csp": null
     }
-    
   },
- 
-
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        {
+          "host": "metaloot",
+          "pathPrefix": [
+            "/open"
+          ]
+        }
+      ],
+      "desktop": {
+        "schemes": [
+          "crazyjumper"
+        ]
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

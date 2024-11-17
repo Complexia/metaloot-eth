@@ -5,7 +5,7 @@
   "identifier": "com.trophyhunter.dev",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3001",
+    "devUrl": "http://localhost:3000",
     "beforeDevCommand": "bun dev",
     "beforeBuildCommand": "npm run build"
   },
@@ -27,8 +27,16 @@
     }
     
   },
- 
-
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        { "host": "metaloot", "pathPrefix": ["/open"] }
+      ],
+      "desktop": {
+        "schemes": ["trophyhunter"]
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
