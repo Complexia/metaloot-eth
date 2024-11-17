@@ -1,6 +1,6 @@
-// import MetaLootNFT from "../contracts/MetaLootNFT.cdc"
 import "MetaLootNFT"
 import "NonFungibleToken"
+import "Marketplace"
 // This transaction transfers an NFT from one user's collection
 // to another user's collection.
 transaction (recipientAddress:Address,nftID:UInt64){
@@ -41,7 +41,8 @@ transaction (recipientAddress:Address,nftID:UInt64){
 
         // Deposit the NFT in the receivers collection
         receiverRef.deposit(token: <-self.transferToken)
-
+        // Remove the NFT from marketplace listings if it exists
+        Marketplace.buyNFT(nftID: nftID, buyer: recipientAddress)
         log("NFT ID ".concat(nftID.toString()).concat(" transferred to account ").concat(recipientAddress.toString()))
     }
 }
