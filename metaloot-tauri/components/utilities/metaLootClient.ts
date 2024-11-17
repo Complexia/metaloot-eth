@@ -189,12 +189,7 @@ export const processUrl = (url: string, user: User | null) => {
             let currentUser = fcl.currentUser();
             const subscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
                 console.log("this is sub user ", currentUser);
-
-
             });
-
-
-
             console.log("currentUser inside start game", currentUser);
 
 

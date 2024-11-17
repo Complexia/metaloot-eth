@@ -164,6 +164,7 @@
 //         .build()
 // }
 
+use actix_web::web;
 // Add these imports at the top of the file
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
 use once_cell::sync::Lazy;
@@ -326,20 +327,12 @@ async fn end_game() -> impl Responder {
 }
 
 #[get("/item/add")]
-async fn add_item() -> impl Responder {
-    println!("/item/add");
+async fn add_item(item: web::Json<serde_json::Value>) -> impl Responder {
+    println!("/item/add with payload: {:?}", item);
     GLOBAL_APP_HANDLE
         .get()
         .unwrap()
-        .emit("add-item", serde_json::json!({
-            "itemName": "2pac",
-            "itemType": "123",
-            "attributes": serde_json::json!({
-                "attack":"100",
-                "defense":3
-            }),
-            "thumpNail": "",
-        }))
+        .emit("add-item", item.into_inner())
         .unwrap();
     HttpResponse::Ok().finish()
 }
