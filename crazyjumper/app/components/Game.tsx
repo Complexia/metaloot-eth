@@ -47,7 +47,7 @@ export default function Game() {
             nftData.forEach((nft: any) => {
                 console.log("nft: ", nft)
                 console.log("nft name: ", nft.name)
-                if (nft.name === "Brilliant Trophy") {
+                if (nft.name === "The Mike Tyson") {
                     setNameTag("Champion");
                 }
             });

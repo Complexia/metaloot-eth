@@ -32,8 +32,8 @@ const GameCard = (game: Game) => {
             key={game.id}
             onClick={async () => {
                 // Handle click event for the game card
-                console.log(`Clicked game: ${game.title}`);
-                await openExternalUri();
+                console.log(`Opening game: ${game.title}`);
+                await open(game.uri);
             }}
             className="card bg-base-100 shadow-xl  h-96 cursor-pointer">
             <figure className="h-1/2">

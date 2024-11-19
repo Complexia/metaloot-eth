@@ -123,7 +123,7 @@ export const Game = () => {
           )
           if (trophyDistance < 20) {
             const payload = {
-                "itemName": "Brilliant Trophy",
+                "itemName": "The Mike Tyson",
                 "itemType": "Gloves",
                 "attributes": {
                     "key": "Creativity",

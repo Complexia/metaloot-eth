@@ -5,7 +5,7 @@
   "identifier": "com.crazyjumper.dev",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3000",
+    "devUrl": "http://localhost:3001",
     "beforeDevCommand": "bun dev",
     "beforeBuildCommand": "npm run build"
   },
