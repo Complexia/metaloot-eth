@@ -27,8 +27,16 @@
     }
     
   },
- 
-
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        { "host": "metaloot", "pathPrefix": ["/open"] }
+      ],
+      "desktop": {
+        "schemes": ["trophyhunter"]
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

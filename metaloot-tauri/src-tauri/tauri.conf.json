@@ -5,7 +5,7 @@
   "identifier": "com.metaloot.dev",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3000",
+    "devUrl": "http://localhost:3000/",
     "beforeDevCommand": "bun dev",
     "beforeBuildCommand": "npm run build"
   },
@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' ipc://localhost https://rest-testnet.onflow.org https://biz-touch-7unj.shuttle.app https://pulse.walletconnect.org https://verify.walletconnect.org wss://relay.walletconnect.com blob:; img-src 'self' data: https://*.supabase.co; script-src 'self'; style-src 'self'; frame-src 'self' https://fcl-discovery.onflow.org https://verify.walletconnect.org;"
+      "csp": "default-src 'self'; connect-src 'self' ipc://localhost https://rest-testnet.onflow.org/ https://biz-touch-7unj.shuttle.app/ https://pulse.walletconnect.org/ https://verify.walletconnect.org/ wss://relay.walletconnect.com blob:; img-src 'self' data: https://%2A.supabase.co/; script-src 'self'; style-src 'self'; frame-src 'self' https://fcl-discovery.onflow.org/ https://verify.walletconnect.org/;"
     }
   },
   "plugins": {
@@ -44,6 +44,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-    
+
   }
 }

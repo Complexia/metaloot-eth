@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import Map from './Map'
 import Character from './Character'
 import Trophy from './Trophy'
-import { open } from '@tauri-apps/plugin-shell'
+// import { open } from '@tauri-apps/plugin-shell'
 
-import { invoke } from '@tauri-apps/api/core';
+// import { invoke } from '@tauri-apps/api/core';
 
 
 export type Position = {
@@ -122,9 +122,8 @@ export const Game = () => {
             Math.pow(newY - trophyPos.y, 2)
           )
           if (trophyDistance < 20) {
-            let payload = {
-              
-                "itemName": "Boxing Gloves",
+            const payload = {
+                "itemName": "The Mike Tyson",
                 "itemType": "Gloves",
                 "attributes": {
                     "key": "Creativity",
