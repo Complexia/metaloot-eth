@@ -31,12 +31,11 @@ const InventoryCard = (item: InventoryItem) => {
                 // await openExternalUri();
             }}
             className="card bg-base-100 shadow-xl  h-96 cursor-pointer">
-            <figure className="h-1/2">
+            <figure className="">
                 <img
-                    // src={item.thumbnail}
-                    src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/box.jpg"
+                    src={item.thumbnail?.startsWith('https') ? item.thumbnail : "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/box.jpg"}
                     alt="Shoes"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full" // object-cover
                 />
             </figure>
             <div className="card-body h-1/2 flex flex-col">
@@ -47,13 +46,13 @@ const InventoryCard = (item: InventoryItem) => {
                 <p className="flex-grow overflow-hidden">
                     {truncateText(item.description, 60)}
                 </p>
-                <p className="flex-grow overflow-hidden">
-                    {truncateText(JSON.stringify(item.attributes), 60)}
-                </p>
-                {/* <div className="card-actions justify-end">
-                    <div className="badge badge-outline">Fashion</div>
-                    <div className="badge badge-outline">Products</div>
-                </div> */}
+                <div className="card-actions justify-end">
+                    {item.attributes && Object.entries(item.attributes).map(([key, value]) => (
+                        <div key={key} className="badge badge-outline">
+                            {key}: {value}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

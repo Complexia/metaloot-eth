@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { InventoryPanel } from './inventory/inventory-panel';
 import { TransactionsPanel } from './transactions/transactions-panel';
 import { AiPanel } from './ai/mainMenu';
+import { SwapPanel } from './swapverse/swapPanel';
 
 const Interface: React.FC = () => {
 
@@ -15,25 +16,30 @@ const Interface: React.FC = () => {
   const updateTab = (tab) => {
     console.log("uoo", tab)
     setTab(tab);
-  } 
+  }
 
   return (
     <div className="flex flex-col">
-      <Navbar updateTab={updateTab}/>
+      <Navbar updateTab={updateTab} />
       <div className="flex">
         <div className="w-1/5">
           <Sidebar />
         </div>
         <div className="w-4/5">
-          {tab === "games" ? (
+          {tab === "Arcade" ? (
             <GamesPanel />
-          ) : tab === "inventory" ? (
+          ) : tab === "MetaTreasures" ? (
             <InventoryPanel />
-          ) : tab === "transactions" ? (
-            <TransactionsPanel />
-          ) : tab === "shop" ? (
-            <AiPanel />
-          ) : null}
+          ) : tab === "Metanomics" ? (
+            <InventoryPanel />
+          ) : tab === "Swapverse" ? (
+            <SwapPanel />
+          )
+            : tab === "Transactions" ? (
+              <TransactionsPanel />
+            ) : tab === "Shop" ? (
+              <AiPanel />
+            ) : null}
         </div>
       </div>
     </div>

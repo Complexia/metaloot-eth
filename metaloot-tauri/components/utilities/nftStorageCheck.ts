@@ -34,8 +34,7 @@ fcl.config()
 
 export async function userStorageCheck() {
   const user = await fcl.currentUser.snapshot();
-
-  console.log("here 0, ", user.addr);
+  console.log("Checking user storage for NFT, ", user.addr);
   // Check if the user has the NFT receiver capability
   try {
     const result = await fcl.mutate({
@@ -85,7 +84,7 @@ transaction {
       authorizations: [fcl.currentUser],
       // limit: 999, // Set an appropriate gas limit
     });
-    console.log("this is result ", result);
+    console.log("this is OC result ", result);
   } catch (error) {
     console.error("Error setting up NFT storage:", error);
     // throw error;

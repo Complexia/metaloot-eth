@@ -12,162 +12,60 @@ import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
 import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core';
 import WebSocket from '@tauri-apps/plugin-websocket'
+
 const Navbar = ({ updateTab }) => {
   const { user, setUser } = useUser();
-  const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance
-  // const [gameData, setGameData] = useState<Game | null>(null); // Store game data
-  useEffect(() => {
-    const setupWebSocket = async () => {
-      try {
-        const connection = await WebSocket.connect('ws://localhost:8000/websocket');
-        setWs(connection);
-        // Add message listener
-        connection.addListener((msg) => {
-          console.log('Received Message:', msg);
-        });
-        // Optional: Send a message when the connection opens
-        await connection.send('0x12313123123');
-        console.log('WebSocket connection established and ping sent');
-      } catch (error) {
-        console.error('Error connecting to WebSocket:', error);
-      }
-    };
-
-    setupWebSocket();
-    // if (ws) {
-    //    ws.send('concac');
-    // }
-    const setupListeners = async () => {
-      console.log("USERR", user)
-      await listen('get-user', (event) => {
-        console.log("user-response12 event listener triggered", event);
-      });
-
-      await listen('get-stored-user', (event) => {
-        // invoke to BE 
-        return {
-          action: 'get-stored-user',
-          user: user
-        };
-        // console.log("get-stored-user event listener triggered", event);
-        // console.log("this is the user here", user);
-        // let resp = processUrl(event.event as string, user);
-        // let response_p = {
-        //   response_data: JSON.stringify(resp),
-        //   user_json: JSON.stringify(user),
-        //   user: user
-        // };
-        // console.log("response_ps from navbar", response_p);
-      });
-
-      await listen('start-game', (event) => {
-        startGame();
-        // console.log("start-game event listener triggered", event);
-        // console.log("this is the user here", user);
-        // let resp = processUrl(event.event as string, user);
-        // let response_p = {
-        //   response_data: JSON.stringify(resp),
-        //   user_json: JSON.stringify(user),
-        //   user: user
-        // };
-        // console.log("response_ps from navbar start game", response_p);
-      });
-
-      await listen('end-game', (event) => {
-        stopGame();
-        // console.log("end-game event listener triggered", event);
-        // console.log("this is the user here", user);
-        // let resp = processUrl(event.event as string, user);
-        // let response_p = {
-        //   response_data: JSON.stringify(resp),
-        //   user_json: JSON.stringify(user),
-        //   user: user
-        // };
-        // console.log("response_ps from navbar end game", response_p);
-      });
-
-      await listen('add-item', (event) => {
-        console.log("add-item event listener triggered", event.payload);
-        const payload = event.payload as {
-          itemName: string;
-          itemType: string,
-          attributes: object,
-          thumpNail: string
-        };
-        mintNFT(payload.itemName, payload.itemType, payload.attributes, payload.thumpNail);
-        // console.log("this is the user here", user);
-        // let resp = processUrl(event.event as string, user);
-        // let response_p = {
-        //   response_data: JSON.stringify(resp),
-        //   user_json: JSON.stringify(user),
-        //   user: user
-        // };
-        // console.log("response_ps from navbar add item", response_p);
-      });
-
-      await listen('get-user-nfts', (event) => {
-        console.log("get-user-nfts event listener triggered", event);
-        console.log("this is the user here", user);
-        let resp = processUrl(event.event as string, user);
-        let response_p = {
-          response_data: JSON.stringify(resp),
-          user_json: JSON.stringify(user),
-          user: user
-        };
-        console.log("response_ps from navbar get-user-nfts", response_p);
-
-      });
-    };
-
-    // Only run on client side
-    if (typeof window !== 'undefined') {
-      setupListeners();
-    }
-  }, []); // Empty dependency array since these listeners should only be set up once
-
-  const listener = async () => {
-    console.log("HELLO from navbar ", user);
-    await onOpenUrl(async (urls: string[]) => {
-      console.log('deep link:', urls)
-      const res = metaLootClient(urls, user);
-      console.log("this is meta response ", res);
-    })
-  };
-
+  // possibly don't need -> only need to send Message Back
+  const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance 
   const [isLoading, setIsLoading] = useState(false);
-  //const [user, setUser] = useState<User>({ addr: "", loggedIn: false });
-  // useEffect(() => {
 
-  //   // Subscribe to user state'
-  //   //"@ts-expect-error"
-  //   const unsubscribe = fcl.currentUser.subscribe(async (currentUser: User) => {
-  //     setIsLoading(true);
-  //     console.log("this is user ", currentUser);
-  //     if (currentUser.loggedIn) {
-  //       setUser(currentUser);
-  //       // Ensure account is set up to receive NFTs
-
-  //       await userStorageCheck();
-  //       setIsLoading(false);
-  //       // setError(""); // Clear any previous errors
-  //     } else {
-  //       setIsLoading(false);
-  //       setUser({ addr: "", loggedIn: false });
-  //     }
-  //   });
-
-  //   // Cleanup subscription on unmount
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
-
-  useEffect(() => {
-
-    console.log("this gets called when user changes ", user);
-    listener();
-
-  }, [user]);
+  /****************************************************
+   * 🎮 WEBSOCKET GAME STATE SYNCHRONIZATION 🎮
+   * ==========================================
+   * 
+   * 🔌 Real-time connection to game server
+   * 👥 Handles multiplayer interactions
+   * 🎯 Manages player state updates
+   * 
+   * 🔗 Flow Blockchain Integration:
+   * - Verifies asset ownership
+   * - Secures in-game items
+   * - Enables NFT minting
+   ****************************************************/
+  const setupWebSocket = async (address: string) => {
+    try {
+      const connection = await WebSocket.connect(`ws://localhost:8000/websocket/${address}`);
+      setWs(connection);
+      // Add message listener
+      connection.addListener((msg) => {
+        console.log('Received Message From WebSocket: ', msg);
+        // Check if msg.data exists and is exactly "game-start"
+        if (msg.data && msg.data === "game-start") {
+          console.log('Game started!');
+          startGame();
+          // Add game start logic here
+        } else if (msg.data && msg.data === "game-end") {
+          console.log('Game Ended!');
+          stopGame();
+          // Add game end logic here
+        } else {
+          console.log("ELSE ......");
+          let data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
+          // Add mint NFT logic here
+          console.log('Item Minting ! ', data);
+          const payload = data as {
+            itemName: string;
+            itemType: string,
+            attributes: object,
+            thumpNail: string
+          };
+          mintNFT(payload.itemName, payload.itemType, payload.attributes, payload.thumpNail);
+        }
+      });
+    } catch (error) {
+      console.error('Error connecting to WebSocket:', error);
+    }
+  };
 
   const handleLogin = async () => {
     try {
@@ -177,18 +75,14 @@ const Navbar = ({ updateTab }) => {
       fcl.currentUser.subscribe(async (currentUser: User) => {
         setUser(currentUser);
         console.log("set this to current user ", currentUser);
-        let payload = {
-          addr: currentUser.addr,
-          cid: currentUser.cid,
-          loggedIn: currentUser.loggedIn
+        if (currentUser.loggedIn) {
+          setupWebSocket(currentUser.addr);
+          await userStorageCheck();
         }
-        let resp = await invoke("store_user_data", { userData: JSON.stringify(payload) });
-        console.log("this is the response from the store_user_data", resp);
       });
       setIsLoading(false);
     } catch (err) {
       console.error("Authentication failed:", err);
-      // setError("Authentication failed. Please try again.");
     }
   };
 
@@ -197,11 +91,6 @@ const Navbar = ({ updateTab }) => {
     setUser({ addr: "", loggedIn: false });
   };
 
-  const readUser = () => {
-    console.log("current user trace ", user);
-    const res = metaLootClient(["metaloot://callback/get-user"], user);
-    console.log("this is meta response ", res);
-  };
   return (
     <nav className="navbar bg-base-200">
       {isLoading ? (
@@ -246,32 +135,24 @@ const Navbar = ({ updateTab }) => {
 
           <div className="flex-none">
             <ul className="menu menu-horizontal px-1">
-              <li><span onClick={() => updateTab("games")}>Games</span></li>
-              <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
-              <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
-              <li><span onClick={() => updateTab("shop")}>Shop</span></li>
-
-              <li><span onClick={() => transferNFT("0xdfc20aee650fcbdf", 278176441924202)}>Test Transfer</span></li>
-
+              <li><span onClick={() => updateTab("Arcade")}>Arcade</span></li>
+              <li><span onClick={() => updateTab("MetaTreasures")}>MetaTreasures</span></li>
+              <li><span onClick={() => updateTab("Swapverse")}>Swapverse</span></li>
+              {/* <li><span onClick={() => updateTab("Metanomics")}>Metanomics</span></li> */}
+              <li><span className="opacity-50 cursor-not-allowed">Metanomics</span></li>
+              {/* <li><span onClick={() => updateTab("Transactions")}>Transactions</span></li> */}
+              <li><span className="opacity-50 cursor-not-allowed">Transactions</span></li>
+              {/* <li><span onClick={() => updateTab("Shop")}>Shop</span></li> */}
+              <li><span className="opacity-50 cursor-not-allowed">Shop</span></li>
             </ul>
           </div>
 
           {/* Third sector: Login/Logout */}
           <div className="flex-none">
             {user?.loggedIn ? (
-
-              // <button onClick={handleLogout} className="btn btn-ghost">
-              //   Logout
-              // </button>
-              <>
-                <button onClick={handleLogout} className="btn btn-ghost">
-                  Logout
-                </button>
-                <button onClick={readUser} className="btn btn-ghost">
-                  TEST
-                </button>
-              </>
-
+              <button onClick={handleLogout} className="btn btn-ghost">
+                Logout
+              </button>
             ) : (
               <button onClick={handleLogin} className="btn btn-ghost">
                 Login with Flow Wallet
