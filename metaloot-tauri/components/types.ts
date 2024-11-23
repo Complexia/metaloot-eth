@@ -21,5 +21,4 @@ interface InventoryItem {
   thumbnail: string
 }
 
-
 export type { Game, InventoryItem };

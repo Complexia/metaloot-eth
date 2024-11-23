@@ -11,13 +11,32 @@ import { useUser } from '../context/UserContext';
 import metaLootClient, { processUrl, User } from '../utilities/metaLootClient';
 import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core';
-// Define the User type based on FCL's user state
-
+import WebSocket from '@tauri-apps/plugin-websocket'
 const Navbar = ({ updateTab }) => {
   const { user, setUser } = useUser();
-
+  const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance
+  // const [gameData, setGameData] = useState<Game | null>(null); // Store game data
   useEffect(() => {
-    // Move event listeners inside useEffect
+    const setupWebSocket = async () => {
+      try {
+        const connection = await WebSocket.connect('ws://localhost:8000/websocket');
+        setWs(connection);
+        // Add message listener
+        connection.addListener((msg) => {
+          console.log('Received Message:', msg);
+        });
+        // Optional: Send a message when the connection opens
+        await connection.send('0x12313123123');
+        console.log('WebSocket connection established and ping sent');
+      } catch (error) {
+        console.error('Error connecting to WebSocket:', error);
+      }
+    };
+
+    setupWebSocket();
+    // if (ws) {
+    //    ws.send('concac');
+    // }
     const setupListeners = async () => {
       console.log("USERR", user)
       await listen('get-user', (event) => {
@@ -231,7 +250,7 @@ const Navbar = ({ updateTab }) => {
               <li><span onClick={() => updateTab("inventory")}>Inventory</span></li>
               <li><span onClick={() => updateTab("transactions")}>Transactions</span></li>
               <li><span onClick={() => updateTab("shop")}>Shop</span></li>
-              
+
               <li><span onClick={() => transferNFT("0xdfc20aee650fcbdf", 278176441924202)}>Test Transfer</span></li>
 
             </ul>
