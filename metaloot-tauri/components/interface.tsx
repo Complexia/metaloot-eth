@@ -34,12 +34,13 @@ const Interface: React.FC = () => {
             <InventoryPanel />
           ) : tab === "Swapverse" ? (
             <SwapPanel />
-          )
-            : tab === "Transactions" ? (
-              <TransactionsPanel />
-            ) : tab === "Shop" ? (
-              <AiPanel />
-            ) : null}
+          ) : tab === "Transactions" ? (
+            <TransactionsPanel />
+          ) : tab === "Shop" ? (
+            <AiPanel />
+          ) : (
+            <GamesPanel />
+          )}
         </div>
       </div>
     </div>
