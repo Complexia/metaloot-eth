@@ -5,7 +5,11 @@ import { open } from '@tauri-apps/plugin-shell'
 import { useState } from 'react';
 import SwapModal from './swapModal';
 
-const SwapCard = (item: InventoryItem) => {
+interface SwapCardProps extends InventoryItem {
+    disableModal?: boolean;
+}
+
+const SwapCard = ({ disableModal, ...item }: SwapCardProps) => {
     const [showModal, setShowModal] = useState(false);
 
     // Function to truncate text
@@ -13,33 +17,11 @@ const SwapCard = (item: InventoryItem) => {
         if (!text) return '';
         return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     };
-
-    // Mock swap options - in real app these would come from props or API
-    const mockSwapOptions: InventoryItem[] = [
-        {
-            id: "4",
-            uuid: "coupon-004",
-            description: "15% off on digital services",
-            itemName: "Digital Services Coupon", 
-            name: "15% Off Digital Services",
-            itemType: "Code",
-            attributes: {
-                validUntil: "2024-12-31",
-                service: "Digital"
-            },
-            metadata: {
-                issueDate: "2023-12-01",
-                terms: "Valid for digital services only"
-            },
-            thumbnail: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/Image%2010.jpeg"
-        }
-    ];
-
     return (
         <>
             <div
                 key={item.id}
-                onClick={() => setShowModal(true)}
+                onClick={() => disableModal ? setShowModal(false) : setShowModal(true)}
                 className="relative bg-base-100 shadow-xl h-96 cursor-pointer overflow-hidden transform hover:scale-105 transition-transform duration-200"
             >
                 {/* Ticket zigzag edges */}
@@ -56,7 +38,7 @@ const SwapCard = (item: InventoryItem) => {
 
                 {/* Perforation line */}
                 <div className="absolute left-1/4 top-0 bottom-0 border-l-2 border-dashed border-base-content/20"></div>
-                
+
                 <div className="grid grid-cols-4 h-full">
                     {/* Left side - Stub */}
                     <div className="col-span-1 p-4 flex flex-col items-center justify-center border-r border-base-content/10">
@@ -88,7 +70,7 @@ const SwapCard = (item: InventoryItem) => {
                             <p className="opacity-75 mb-4">
                                 {truncateText(item.description, 60)}
                             </p>
-                            
+
                             {/* Attributes section */}
                             <div className="mt-auto flex flex-wrap gap-2">
                                 {item.attributes && Object.entries(item.attributes).map(([key, value]) => (
@@ -105,7 +87,6 @@ const SwapCard = (item: InventoryItem) => {
             {showModal && (
                 <SwapModal
                     selectedItem={item}
-                    swapOptions={mockSwapOptions}
                     onClose={() => setShowModal(false)}
                 />
             )}

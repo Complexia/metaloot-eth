@@ -2,6 +2,7 @@ import * as fcl from "@onflow/fcl";
 import * as t from '@onflow/typedefs';
 import { User } from "./metaLootClient";
 import { invoke } from "@tauri-apps/api/core";
+import { InventoryItem } from "../types";
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║ Flow Client Library (FCL) Configuration                                    ║
@@ -546,6 +547,49 @@ export const transferNFT = async (recipientAddress: string, tokenId: number) => 
       args: (arg, t) => [
         arg(recipientAddress, t.Address),
         arg(tokenId, t.UInt64)
+      ],
+      limit: 1000
+    });
+
+    console.log("Transfer transaction submitted:", transactionId);
+    return transactionId;
+  } catch (error) {
+    console.error("Error transferring NFT:", error);
+    throw error;
+  }
+}
+
+export const swapNFT = async (recipientAddress: string, payload: {swapItem: InventoryItem, inventory: InventoryItem[]}) => {
+  try {
+    const transactionId = await fcl.mutate({
+      cadence: `
+        import NonFungibleToken from 0x631e88ae7f1d7c20
+        import MetaLootNFT from 0xceed54f46d4b1942
+
+        transaction(recipient: Address, withdrawID: UInt64) {
+          prepare(acct: &Account) {
+            // Get the Collection reference from the signer
+            let collectionRef = signer.borrow<&MetaLootNFT.Collection>(
+              from: MetaLootNFT.CollectionStoragePath
+            ) ?? panic("Could not borrow Collection reference")
+
+            // Get the recipient's public account object
+            let recipientAccount = getAccount(recipient)
+
+            // Get the Collection reference from the recipient
+            let depositRef = recipientAccount.getCapability(MetaLootNFT.CollectionPublicPath)
+              .borrow<&{NonFungibleToken.CollectionPublic}>()
+              ?? panic("Could not borrow Collection receiver reference")
+
+            // Withdraw the NFT and deposit it to the recipient's Collection
+            let nft <- collectionRef.withdraw(withdrawID: withdrawID)
+            depositRef.deposit(token: <-nft)
+          }
+        }
+      `,
+      args: (arg, t) => [
+        arg(recipientAddress, t.Address),
+        ...payload.inventory.map(tokenId => arg(tokenId.id, t.UInt64))
       ],
       limit: 1000
     });
