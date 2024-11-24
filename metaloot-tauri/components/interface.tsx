@@ -12,9 +12,10 @@ import { SwapPanel } from './swapverse/swapPanel';
 const Interface: React.FC = () => {
 
   const [tab, setTab] = useState<any>("games");
+  const [sideBar, setSideBar] = useState<any>("");
 
   const updateTab = (tab) => {
-    console.log("uoo", tab)
+    console.log("tab opened ", tab)
     setTab(tab);
   }
 
@@ -23,15 +24,15 @@ const Interface: React.FC = () => {
       <Navbar updateTab={updateTab} />
       <div className="flex">
         <div className="w-1/5">
-          <Sidebar />
+          <Sidebar tab={tab} setSideBar={setSideBar}/>
         </div>
         <div className="w-4/5">
           {tab === "Arcade" ? (
             <GamesPanel />
           ) : tab === "MetaTreasures" ? (
-            <InventoryPanel />
+            <InventoryPanel sideBar={sideBar} />
           ) : tab === "Metanomics" ? (
-            <InventoryPanel />
+            <InventoryPanel sideBar={sideBar} />
           ) : tab === "Swapverse" ? (
             <SwapPanel />
           ) : tab === "Transactions" ? (

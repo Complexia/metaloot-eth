@@ -2,10 +2,41 @@
 
 import React, { useState } from 'react';
 
-const Sidebar = () => {
-  const [activeItem, setActiveItem] = useState('My games');
+const Sidebar = ({ tab, setSideBar }) => {
+  console.log("this is tab ...... , ",tab);
+  const [activeItem, setActiveItem] = useState('');
 
-  const sidebarItems = [
+  const sidebarItems = tab === "Arcade" ? [
+    { name: 'My games', count: 12 },
+    { name: 'Installed games', count: 5 }, 
+    { name: 'All games', count: 87 },
+    { name: 'Favorites', count: 8 },
+  ] : tab === "MetaTreasures" ? [
+    { name: 'My NFTs', count: 3 },
+    { name: 'Redeemables', count: 2 },
+    // { name: 'Marketplace', count: 50 },
+    // { name: 'Watchlist', count: 5 },
+  ] : tab === "Metanomics" ? [
+    { name: 'Balances', count: 1 },
+    { name: 'Trading', count: 0 },
+    // { name: 'Analytics', count: 0 },
+    { name: 'History', count: 12 },
+  ] : tab === "Swapverse" ? [
+    // { name: 'Available Swaps', count: 8 },
+    // { name: 'My Offers', count: 2 },
+    { name: 'Offers', count: 5 },
+    // { name: 'Watchlist', count: 3 },
+  ] : tab === "Transactions" ? [
+    { name: 'Recent', count: 15 },
+    { name: 'Pending', count: 2 },
+    { name: 'Completed', count: 45 },
+    { name: 'Failed', count: 1 },
+  ] : tab === "Shop" ? [
+    { name: 'Featured', count: 10 },
+    { name: 'Categories', count: 6 },
+    { name: 'Deals', count: 4 },
+    { name: 'Cart', count: 0 },
+  ] : [
     { name: 'My games', count: 12 },
     { name: 'Installed games', count: 5 },
     { name: 'All games', count: 87 },
@@ -21,7 +52,10 @@ const Sidebar = () => {
               className={`flex justify-between items-center ${
                 activeItem === item.name ? 'active' : ''
               }`}
-              onClick={() => setActiveItem(item.name)}
+              onClick={() => {
+                setActiveItem(item.name);
+                setSideBar(item.name);
+              }}
             >
               <span>{item.name}</span>
               <span className="badge badge-primary badge-md rounded-md">
