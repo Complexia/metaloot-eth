@@ -10,6 +10,60 @@ import SwapCard from './swapCard';
 export const SwapPanel = () => {
   const [items, setItems] = React.useState<InventoryItem[] | null>([
     {
+      id: "4", 
+      uuid: "voucher-004",
+      description: "10% discount for all purchase",
+      itemName: "Discount Voucher",
+      name: "10% Off Coupon",
+      itemType: "Code",
+      attributes: {
+        // minPurchase: "$50",
+        validUntil: "2024-06-30",
+        region: "Worldwide"
+      },
+      metadata: {
+        issueDate: "2023-12-01",
+        terms: "Valid for standard shipping only"
+      },
+      thumbnail: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/Image%2012.jpeg"
+    },
+    {
+      id: "5", 
+      uuid: "voucher-005",
+      description: "10% off orders under $110",
+      itemName: "Discount Voucher",
+      name: "10% Off Coupon",
+      itemType: "Code",
+      attributes: {
+        // minPurchase: "$50",
+        validUntil: "2024-06-30",
+        region: "Worldwide"
+      },
+      metadata: {
+        issueDate: "2023-12-01",
+        terms: "Valid for standard shipping only"
+      },
+      thumbnail: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/Image%2015.jpeg"
+    },
+    {
+      id: "6", 
+      uuid: "voucher-006",
+      description: "Additional 20% off all sale styles",
+      itemName: "Discount Voucher",
+      name: "20% Off Coupon",
+      itemType: "Code",
+      attributes: {
+        // minPurchase: "$50",
+        validUntil: "2024-06-30",
+        region: "Worldwide"
+      },
+      metadata: {
+        issueDate: "2023-12-01",
+        terms: "Valid for standard shipping only"
+      },
+      thumbnail: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/Image%2013.jpeg"
+    },
+    {
       id: "1",
       uuid: "coupon-001", 
       description: "10% off on your next purchase at MetaStore",
