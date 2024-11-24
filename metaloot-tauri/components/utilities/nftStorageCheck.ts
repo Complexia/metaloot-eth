@@ -406,7 +406,7 @@ export async function mintNFT(itemName: string, itemType: string, attributes: ob
   // let nftContractAddress = "0xf8d6e0586b0a20c7";
   // Check if the user has the NFT receiver capability
   try {
-    
+
     const result = await fcl.mutate({
       cadence: `
 import NonFungibleToken from 0x631e88ae7f1d7c20
@@ -465,7 +465,7 @@ transaction(
   }
 }
 
-export async function getAllItem(userAddress:string) {
+export async function getAllItem(userAddress: string) {
   // let nftContractName = "MetaLootNFT"
   // let nftContractAddress = "0xf8d6e0586b0a20c7";
   // Check if the user has the NFT receiver capability
@@ -503,10 +503,10 @@ fun main(address: Address): [&{NonFungibleToken.NFT}] {
     return nfts
 }
       `,
-   // @ts-ignore
-   args: (arg, t) => [
-    arg(userAddress, t.Address),
-  ]
+      // @ts-ignore
+      args: (arg, t) => [
+        arg(userAddress, t.Address),
+      ]
     });
     console.log("on-chain res: ", result);
     return result;
@@ -559,37 +559,38 @@ export const transferNFT = async (recipientAddress: string, tokenId: number) => 
   }
 }
 
-export const swapNFT = async (recipientAddress: string, payload: {swapItem: InventoryItem, inventory: InventoryItem[]}) => {
+export const swapNFT = async (payload: { swapItem: InventoryItem, inventory: InventoryItem[] }) => {
   try {
     const transactionId = await fcl.mutate({
       cadence: `
-        import NonFungibleToken from 0x631e88ae7f1d7c20
-        import MetaLootNFT from 0xceed54f46d4b1942
+ import MetaLootNFT from 0xceed54f46d4b1942
+ import NonFungibleToken from 0x631e88ae7f1d7c20
 
-        transaction(recipient: Address, withdrawID: UInt64) {
-          prepare(acct: &Account) {
-            // Get the Collection reference from the signer
-            let collectionRef = signer.borrow<&MetaLootNFT.Collection>(
-              from: MetaLootNFT.CollectionStoragePath
-            ) ?? panic("Could not borrow Collection reference")
 
-            // Get the recipient's public account object
-            let recipientAccount = getAccount(recipient)
+transaction(nftIDs: [UInt64]) {
 
-            // Get the Collection reference from the recipient
-            let depositRef = recipientAccount.getCapability(MetaLootNFT.CollectionPublicPath)
-              .borrow<&{NonFungibleToken.CollectionPublic}>()
-              ?? panic("Could not borrow Collection receiver reference")
+  let Collection: auth(NonFungibleToken.Withdraw) &MetaLootNFT.Collection
 
-            // Withdraw the NFT and deposit it to the recipient's Collection
-            let nft <- collectionRef.withdraw(withdrawID: withdrawID)
-            depositRef.deposit(token: <-nft)
-          }
-        }
+  prepare(signer: auth(Storage) &Account) {
+    // borrow a reference to the signer's collection
+    self.Collection = signer.storage.borrow<auth(NonFungibleToken.Withdraw) &MetaLootNFT.Collection>(
+                        from: MetaLootNFT.CollectionStoragePath
+                      ) ?? panic("The signer does not have a MetaLootNFT collection set up, and therefore no NFTs to burn.")
+  }
+
+  execute {
+    for nftID in nftIDs {
+      // withdraw the nft from the collection
+      let nft <- self.Collection.withdraw(withdrawID: nftID)
+
+      // destroy, or "burn", the nft
+      destroy nft
+    }
+  }
+}
       `,
       args: (arg, t) => [
-        arg(recipientAddress, t.Address),
-        ...payload.inventory.map(tokenId => arg(tokenId.id, t.UInt64))
+        arg(payload.inventory.map(item => Number(item.id)), t.Array(t.UInt64))
       ],
       limit: 1000
     });
