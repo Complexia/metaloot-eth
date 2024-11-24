@@ -1,15 +1,8 @@
 import React from 'react';
 import GameCard from '@/components/games/game-card';
 import { Game } from '@/components/types';
-
-// interface GamesPanelProps {
-//   games: Game[];
-// }
-
-
-
-export const GamesPanel = () => {
-
+import * as fcl from "@onflow/fcl";
+export const GamesPanel = ({userAddress}) => {
   const games: Game[] = [
     {
       id: "1",
@@ -37,7 +30,7 @@ export const GamesPanel = () => {
       title: "Noodle-Quest",
       description: "Embark on an interstellar journey across unexplored noodle quest.",
       media: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/noodleQuest",
-      uri: "noodle-quest://open"
+      uri: `noodle-quest://open/${userAddress}`
     },
     {
       id: "5",

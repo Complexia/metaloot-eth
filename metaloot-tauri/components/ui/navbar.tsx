@@ -13,7 +13,7 @@ import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core';
 import WebSocket from '@tauri-apps/plugin-websocket'
 
-const Navbar = ({ updateTab }) => {
+const Navbar = ({ updateTab, setUserAddress }) => {
   const { user, setUser } = useUser();
   // possibly don't need -> only need to send Message Back
   const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance 
@@ -74,6 +74,7 @@ const Navbar = ({ updateTab }) => {
       setIsLoading(true);
       fcl.currentUser.subscribe(async (currentUser: User) => {
         setUser(currentUser);
+        setUserAddress(currentUser.addr);
         console.log("set this to current user ", currentUser);
         if (currentUser.loggedIn) {
           setupWebSocket(currentUser.addr);

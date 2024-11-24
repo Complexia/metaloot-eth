@@ -10,7 +10,7 @@ import { AiPanel } from './ai/mainMenu';
 import { SwapPanel } from './swapverse/swapPanel';
 
 const Interface: React.FC = () => {
-
+  const [userAddress, setUserAddress] = useState<string>("");
   const [tab, setTab] = useState<any>("games");
   const [sideBar, setSideBar] = useState<any>("");
 
@@ -21,14 +21,14 @@ const Interface: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <Navbar updateTab={updateTab} />
+      <Navbar updateTab={updateTab} setUserAddress={setUserAddress} />
       <div className="flex">
         <div className="w-1/5">
-          <Sidebar tab={tab} setSideBar={setSideBar}/>
+          <Sidebar tab={tab} setSideBar={setSideBar} />
         </div>
         <div className="w-4/5">
           {tab === "Arcade" ? (
-            <GamesPanel />
+            <GamesPanel userAddress={userAddress} />
           ) : tab === "MetaTreasures" ? (
             <InventoryPanel sideBar={sideBar} />
           ) : tab === "Metanomics" ? (
@@ -40,7 +40,7 @@ const Interface: React.FC = () => {
           ) : tab === "Shop" ? (
             <AiPanel />
           ) : (
-            <GamesPanel />
+            <GamesPanel userAddress={userAddress} />
           )}
         </div>
       </div>

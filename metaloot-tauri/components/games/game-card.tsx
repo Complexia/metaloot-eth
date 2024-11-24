@@ -32,7 +32,7 @@ const GameCard = (game: Game) => {
             key={game.id}
             onClick={async () => {
                 // Handle click event for the game card
-                console.log(`Opening game: ${game.title}`);
+                console.log(`Opening game: ${game.uri}`);
                 await open(game.uri);
             }}
             className="card bg-base-100 shadow-xl  h-96 cursor-pointer">
