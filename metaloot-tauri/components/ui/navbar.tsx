@@ -34,7 +34,7 @@ const Navbar = ({ updateTab, setUserAddress }) => {
    ****************************************************/
   const setupWebSocket = async (address: string) => {
     try {
-      const connection = await WebSocket.connect(`ws://localhost:8000/websocket/${address}`);
+      const connection = await WebSocket.connect(`ws://metaloot-cloud-d4ec.shuttle.app/websocket/${address}`);
       setWs(connection);
       // Add message listener
       connection.addListener((msg) => {
