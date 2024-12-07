@@ -34,7 +34,7 @@ const Navbar = ({ updateTab, setUserAddress }) => {
    ****************************************************/
   const setupWebSocket = async (address: string) => {
     try {
-      const connection = await WebSocket.connect(`ws://metaloot-cloud-d4ec.shuttle.app/websocket/${address}`);
+      const connection = await WebSocket.connect(`wss://metaloot-cloud-d4ec.shuttle.app/websocket/${address}`);
       setWs(connection);
       // Add message listener
       connection.addListener((msg) => {
@@ -139,8 +139,8 @@ const Navbar = ({ updateTab, setUserAddress }) => {
               <li><span onClick={() => updateTab("Arcade")}>Arcade</span></li>
               <li><span onClick={() => updateTab("MetaTreasures")}>MetaTreasures</span></li>
               <li><span onClick={() => updateTab("Swapverse")}>Swapverse</span></li>
-              {/* <li><span onClick={() => updateTab("Metanomics")}>Metanomics</span></li> */}
-              <li><span className="opacity-50 cursor-not-allowed">Metanomics</span></li>
+              <li><span onClick={() => updateTab("Metanomics")}>Metanomics</span></li>
+              {/* <li><span className="opacity-50 cursor-not-allowed">Metanomics</span></li> */}
               {/* <li><span onClick={() => updateTab("Transactions")}>Transactions</span></li> */}
               <li><span className="opacity-50 cursor-not-allowed">Transactions</span></li>
               {/* <li><span onClick={() => updateTab("Shop")}>Shop</span></li> */}

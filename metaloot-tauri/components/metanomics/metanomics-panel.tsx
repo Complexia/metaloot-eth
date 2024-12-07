@@ -2,15 +2,15 @@
 
 import React from 'react';
 import { InventoryItem } from '@/components/types';
-import InventoryCard from './inventory-card';
+import InventoryCard from '../inventory/inventory-card';
 import * as fcl from "@onflow/fcl";
-import {getAllItem} from '../utilities/nftStorageCheck';
+import {getAllItem, userTokenCheck} from '../utilities/nftStorageCheck';
 
-export const InventoryPanel = ({ sideBar }) => {
+export const MetanomicsPanel = ({ sideBar }) => {
   const [items, setItems] = React.useState<InventoryItem[] | null>(null);
 
   const fetchItems = async () => {
-    if (sideBar === "Redeemables") {
+    if (sideBar === "Balances") {
       console.log("redemm items ")
       try {
         const items = [
@@ -33,6 +33,7 @@ export const InventoryPanel = ({ sideBar }) => {
             thumbnail: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/Image%2015.jpeg"
           },
         ];
+        await userTokenCheck();
         setItems(items);
       } catch (error) {
         console.error('Failed to store NFT data:', error);

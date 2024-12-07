@@ -8,6 +8,7 @@ import { InventoryPanel } from './inventory/inventory-panel';
 import { TransactionsPanel } from './transactions/transactions-panel';
 import { AiPanel } from './ai/mainMenu';
 import { SwapPanel } from './swapverse/swapPanel';
+import { MetanomicsPanel } from './metanomics/metanomics-panel';
 
 const Interface: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string>("");
@@ -32,7 +33,7 @@ const Interface: React.FC = () => {
           ) : tab === "MetaTreasures" ? (
             <InventoryPanel sideBar={sideBar} />
           ) : tab === "Metanomics" ? (
-            <InventoryPanel sideBar={sideBar} />
+            <MetanomicsPanel sideBar={sideBar} />
           ) : tab === "Swapverse" ? (
             <SwapPanel />
           ) : tab === "Transactions" ? (

@@ -602,3 +602,54 @@ transaction(nftIDs: [UInt64]) {
     throw error;
   }
 }
+
+export async function userTokenCheck() {
+  const user = await fcl.currentUser.snapshot();
+  console.log("Checking user storage for NFT, ", user.addr);
+  // Check if the user has the NFT receiver capability
+  try {
+    const result = await fcl.mutate({
+      cadence: `
+import FungibleToken from 0x9a0766d93b6608b7
+import MetaLootToken from 0xceed54f46d4b1942
+
+transaction {
+    prepare(acct: auth(SaveValue, Capabilities) &Account) {
+        log("Requested for capabilities")
+
+        // Check if vault already exists
+        if acct.storage.type(at: MetaLootToken.VaultStoragePath) == nil {
+            // Create and store vault only if it doesn't exist
+            let vault <- MetaLootToken.createEmptyVault(vaultType: Type<@MetaLootToken.Vault>())
+            acct.storage.save(<-vault, to: MetaLootToken.VaultStoragePath)
+            log("Vault created for account")
+        }
+
+        // Check if capability already exists
+        if !acct.capabilities.get<&MetaLootToken.Vault>(MetaLootToken.VaultPublicPath).check() {
+            let cap = acct.capabilities.storage.issue<&MetaLootToken.Vault>(MetaLootToken.VaultStoragePath)
+            acct.capabilities.publish(cap, at: MetaLootToken.VaultPublicPath)
+            log("Capability created")
+        }
+
+        // Check if receiver capability already exists
+        if !acct.capabilities.get<&MetaLootToken.Vault>(MetaLootToken.ReceiverPublicPath).check() {
+            let receiverCap = acct.capabilities.storage.issue<&MetaLootToken.Vault>(MetaLootToken.VaultStoragePath)
+            acct.capabilities.publish(receiverCap, at: MetaLootToken.ReceiverPublicPath)
+            log("Receiver capability created")
+        }
+    }
+}
+      `,
+      authz: fcl.currentUser,
+      proposer: fcl.currentUser,
+      payer: fcl.currentUser,
+      authorizations: [fcl.currentUser],
+      // limit: 999, // Set an appropriate gas limit
+    });
+    console.log("this is OC result ", result);
+  } catch (error) {
+    console.error("Error setting up NFT storage:", error);
+    // throw error;
+  }
+}
